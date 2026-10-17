@@ -26,6 +26,32 @@ table.gr{border-collapse:collapse;min-width:2000px}
 #record-class-buttons{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
 #record-class-buttons button.class-number-button{background:var(--ac2);border-color:var(--bd);color:var(--ac)}
 #record-class-buttons button.active{border-color:var(--ac);font-weight:700}
+#entry-table.compact{max-height:60vh}
+#entry-table.compact table.gr{min-width:900px;width:100%;table-layout:fixed}
+#entry-table.compact th:nth-child(1){width:5%}
+#entry-table.compact th:nth-child(2){width:19%}
+#entry-table.compact th:nth-child(3){width:14%}
+#entry-table.compact th:nth-child(4){width:12%}
+#entry-table.compact th:nth-child(5),#entry-table.compact th:nth-child(6){width:18%}
+#entry-table.compact th:nth-child(7){width:14%}
+#entry-table.compact .gr th{padding:7px 6px}
+#entry-table.compact .gr td{padding:7px 8px;vertical-align:middle}
+#entry-table.compact .compact-main{font-weight:600;line-height:1.3}
+#entry-table.compact .compact-sub{display:block;color:var(--mu);font-size:11px;line-height:1.35;margin-top:2px}
+#entry-table.compact .compact-date{white-space:nowrap}
+#entry-table.compact .compact-actions{white-space:nowrap;text-align:center}
+#entry-table.compact .compact-actions button{padding:4px 8px}
+#entry-table.compact .compact-edit-row>td{padding:10px;background:var(--bg)}
+#entry-table.compact .compact-edit-panel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+#entry-table.compact .compact-group{min-width:0;padding:10px;background:var(--pn);border:1px solid var(--bd);border-radius:7px}
+#entry-table.compact .compact-group h3{margin:0 0 8px;font-size:13px}
+#entry-table.compact .compact-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+#entry-table.compact .compact-field{min-width:0}
+#entry-table.compact .compact-field input,#entry-table.compact .compact-field select{min-width:0;min-height:34px;background:var(--pn)}
+#entry-table.compact .compact-field textarea{min-height:58px;background:var(--pn)}
+#entry-table.compact .compact-field.wide{grid-column:1/-1}
+#entry-table.compact .compact-close{grid-column:1/-1;justify-self:end}
+@media(max-width:760px){#entry-table.compact .compact-edit-panel{grid-template-columns:1fr}#entry-table.compact table.gr{min-width:760px}}
 .filter-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .filter-head button{border:0;background:transparent;color:var(--mu);padding:0 2px;font-size:13px}
 .filter-head button.filtered{color:var(--ac);font-weight:700}
@@ -134,6 +160,29 @@ table.gr{border-collapse:collapse;min-width:2000px}
 .fx table.sb tr.sgr td{height:12mm}.fx table.sb td.cm{height:10mm}.fx table.sb{margin-top:2mm}
 .pg.ck.fx{padding-top:min(var(--mt,8mm),8mm);padding-bottom:min(var(--mb,12mm),8mm)}
 .fx table.cl td{padding:.5mm 1.2mm}.fx table.rw td{padding:.4mm 1.2mm}.fx table.rw tr.th td{padding:.6mm 1mm}
+.dl-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.dl-path{flex:1;min-width:180px;display:flex;flex-wrap:wrap;gap:2px;align-items:center}
+.dl-path button{background:transparent;border:0;color:var(--ac);padding:2px 4px;text-decoration:underline}
+.dl-up{display:inline-block;cursor:pointer;border:1px solid var(--ac);color:var(--ac);border-radius:6px;padding:7px 12px}
+.dl-msg{min-height:18px;font-size:12px;color:var(--mu);margin-bottom:6px}
+.dl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;min-height:80px;border:1px dashed transparent;border-radius:8px}
+.dl.drag .dl-grid{border-color:var(--ac);background:var(--ac2)}
+.dl-it{position:relative;border:1px solid var(--bd);border-radius:7px;background:var(--bg);padding:6px;font-size:12px;cursor:pointer;overflow:hidden;text-align:center}
+.dl-it.on{outline:2px solid var(--ac);background:var(--ac2)}
+.dl-th{height:84px;display:flex;align-items:center;justify-content:center;font-size:30px;background:var(--pn);border-radius:4px;margin-bottom:4px}
+.dl-th img{max-width:100%;max-height:100%;object-fit:contain}
+.dl-it span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dl-rm{position:absolute;top:2px;right:2px;padding:1px 5px;font-size:11px;background:var(--pn)}
+.dl-modal{width:min(900px,96vw);padding:0;border:1px solid var(--bd);border-radius:10px;background:var(--pn);color:var(--tx)}
+.dl-modal::backdrop{background:rgba(0,0,0,.45)}
+.dl-mh,.dl-mf{display:flex;gap:8px;align-items:center;padding:10px 14px}
+.dl-mh{justify-content:space-between;border-bottom:1px solid var(--bd)}
+.dl-mf{border-top:1px solid var(--bd);justify-content:flex-end}.dl-cnt{flex:1;color:var(--mu);font-size:12px}
+.dl-mb{padding:12px 14px;overflow:auto;max-height:62vh}
+.att-it{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 8px;border:1px solid var(--bd);border-radius:6px;margin:4px 0;background:var(--bg)}
+.pg.pdf-pg{padding:0!important;display:flex!important;align-items:center;justify-content:center}
+.pdf-pg img{width:100%;height:100%;object-fit:contain}.pdf-wait{color:#555;font:14px sans-serif;padding:20px;text-align:center}
+.dl-tb{width:100%;border-collapse:collapse;font-size:13px}.dl-tb th,.dl-tb td{border:1px solid var(--bd);padding:6px 8px;text-align:left}.dl-tb th{background:var(--ac2);white-space:nowrap}.dl-tb tr[data-a=go]{cursor:pointer}.dl-tb td:last-child{white-space:nowrap;text-align:right}.dl-tb button{padding:3px 8px;margin-left:4px}.dl-gd{color:var(--ac);font-size:13px}
 </style></head><body><div id="lg" class="np"><div class="box"><h1>Đăng nhập</h1><p class="sub">Dữ liệu hồ sơ của bạn được tải về sau khi đăng nhập.</p>
 <div><label>URL Web App (Apps Script)</label><input id="lu" autocomplete="off"></div>
 <div style="margin-top:8px"><label>ID người dùng</label><input id="li" autocomplete="username"></div>
@@ -159,6 +208,9 @@ table.gr{border-collapse:collapse;min-width:2000px}
   </div>
 </details>
     <!-- ===================================== -->
+<details open id="drive-lib"><summary>📤 Up dữ liệu — kho lưu trữ biên bản nghiệm thu (đồng bộ với Google Drive)</summary><div class="in">
+<p style="color:var(--mu);font-size:12px;margin:0 0 8px">Nghiệm thu xong, tạo thư mục (ví dụ theo ngày / tháp / tầng) rồi up biên bản đã ký, ảnh, PDF, Word, Excel… lên đây. Tệp hiện ngay tại đây và nằm trong thư mục “HoSoNghiemThu_TaiLieu” trên Google Drive. Mỗi tệp tối đa 18 MB.</p>
+<div id="dl-host"></div></div></details>
 <details open id="qf"><summary>0. Phiếu nghiệm thu (chọn vị trí → thông tin hồ sơ → nhập số lượng theo bảng)</summary><div class="in">
 <div class="g">
 <div><label>Tháp</label><select id="qt"></select></div>
@@ -205,13 +257,13 @@ table.gr{border-collapse:collapse;min-width:2000px}
 <div style="grid-column:1/-1;font-size:12px;color:#666">Chèn {trang} = số trang hiện tại, {tong} = tổng số trang. Header/footer nằm trong vùng lề trên/dưới nên cần để lề tối thiểu ~10mm.</div></div></div></details>
 <div class="bar">
 <div><button id="add">+ Thêm dòng</button> <button class="s" id="paste">Dán từ Excel</button> <button class="s" id="clr">Xóa hết</button></div>
-<button class="s" type="button" id="reset-table-filters">Xóa tất cả bộ lọc</button>
+<div><button class="s" type="button" id="entry-layout-toggle" aria-pressed="true">Hiện bảng đầy đủ</button> <button class="s" type="button" id="reset-table-filters">Xóa tất cả bộ lọc</button></div>
 </div>
 <div id="record-class-buttons" aria-label="Phân loại biên bản"></div>
-<div class="tw"><table class="gr"><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+<div id="entry-table" class="tw compact"><table class="gr"><thead id="th"></thead><tbody id="tb"></tbody></table></div>
 <details open id="photo-entry"><summary>4. Hình ảnh nghiệm thu (chọn biên bản, nhập đủ Ảnh 1–4)</summary><div class="in">
 <div><label for="photo-row">Biên bản cần chèn ảnh</label><select id="photo-row"></select></div>
-<p style="color:var(--mu);font-size:12px;margin:6px 0">Mỗi biên bản có bộ 4 ảnh riêng. Chọn biên bản khác để nhập ảnh của biên bản đó; ảnh đã nhập vẫn được giữ. Ảnh lưu trên trình duyệt/thiết bị này, không tải lên Google Sheet.</p>
+<p style="color:var(--mu);font-size:12px;margin:6px 0">Mỗi biên bản có bộ 4 ảnh riêng. Chọn biên bản khác để nhập ảnh của biên bản đó; ảnh đã nhập vẫn được giữ. Bấm “In biên bản đang chọn kèm ảnh” để in đúng biên bản này. Ảnh lưu trên trình duyệt/thiết bị này, không tải lên Google Sheet.</p>
 <div class="photo-files">
 <div class="photo-upload"><label for="photo-image-1">Ảnh 1 <span aria-hidden="true">*</span></label><input id="photo-image-1" type="file" accept="image/*" data-photo-image="0" required><button class="s" type="button" data-photo-clear="0">Xóa ảnh</button><img class="photo-thumb" data-photo-preview="0" alt="Xem trước ảnh 1" hidden></div>
 <div class="photo-upload"><label for="photo-image-2">Ảnh 2 <span aria-hidden="true">*</span></label><input id="photo-image-2" type="file" accept="image/*" data-photo-image="1" required><button class="s" type="button" data-photo-clear="1">Xóa ảnh</button><img class="photo-thumb" data-photo-preview="1" alt="Xem trước ảnh 2" hidden></div>
@@ -221,7 +273,15 @@ table.gr{border-collapse:collapse;min-width:2000px}
 <div class="g"><div><label for="photo-attachment">Đính kèm</label><input id="photo-attachment" data-photo-field="attachment"></div>
 <div><label for="photo-distribution">Phân phối</label><input id="photo-distribution" data-photo-field="distribution"></div>
 <div style="grid-column:1/-1"><label for="photo-comment">Ý kiến</label><textarea id="photo-comment" rows="3" data-photo-field="comment"></textarea></div></div>
+<div class="bar"><button type="button" id="photo-print-current">In biên bản đang chọn kèm ảnh</button></div>
 <div id="photo-status" role="status" aria-live="polite"></div></div></details>
+<details id="att-entry"><summary>5. Chèn file PDF vào biên bản (in kèm sau biên bản)</summary><div class="in">
+<div><label for="att-row">Biên bản cần gắn PDF</label><select id="att-row"></select></div>
+<div class="bar" style="margin:8px 0;align-items:center"><button type="button" id="att-drive">📁 Chọn PDF từ kho “Up dữ liệu”</button><label class="dl-up">💻 Chọn PDF từ máy<input type="file" id="att-file" accept="application/pdf" multiple hidden></label></div>
+<small style="color:var(--mu)">PDF chọn từ máy sẽ được lưu vào thư mục đang mở trong mục “Up dữ liệu”: <b class="dl-where">“Thư viện”</b>. Khi xuất PDF, tick “PDF đính kèm” để các trang PDF chèn ngay sau biên bản tương ứng.</small>
+<div id="att-list" style="margin-top:8px"></div>
+<div id="att-status" role="status" aria-live="polite" style="color:var(--mu);font-size:12px;margin-top:6px"></div></div></details>
+
 <div class="bar">
 <div><label>Chọn số thứ tự (vd: 1-100 hoặc 1,3,5-8; để trống = tất cả)</label><input id="rng" placeholder="1-100"></div>
 <div><label>Loại biên bản</label>
@@ -229,7 +289,8 @@ table.gr{border-collapse:collapse;min-width:2000px}
 <label><input type="checkbox" class="ty" value="n" checked style="width:auto"> BBNT nội bộ</label>
 <label><input type="checkbox" class="ty" value="b" checked style="width:auto"> BBNT công việc</label>
 <label><input type="checkbox" class="ty" value="c" checked style="width:auto"> Checklist</label>
-<label><input type="checkbox" class="ty" value="p" style="width:auto"> Hình ảnh nghiệm thu</label></div>
+<label><input type="checkbox" class="ty" value="p" style="width:auto"> Hình ảnh nghiệm thu</label>
+<label><input type="checkbox" class="ty" value="f" checked style="width:auto"> PDF đính kèm</label></div>
 <div><label>Thứ tự in</label><select id="ord"><option value="r">Theo từng đợt (YCNT→NB→BBNT→Check của số 1, rồi số 2…)</option><option value="t">Theo loại (tất cả YCNT, rồi tất cả NB…)</option></select></div>
 <div><button id="snd">Gửi dữ liệu về Google</button> <button class="s" id="qrv">📋 Xem lại biên bản đã xong</button> <button id="pdf">Xuất PDF</button></div>
 <small style="color:var(--mu);flex-basis:100%">Bấm “Xuất PDF” → hộp thoại in → chọn “Lưu dưới dạng PDF”, khổ A4, lề “None”, tắt “Headers and footers”.</small>
@@ -263,7 +324,7 @@ const T1="LẮP DỰNG KHUNG CỬA // DOOR/ WINDOW FRAME INSTALLATION",T2="LẮP
 function mgck(){if(String(S.ckv)!==CKV){S.ck1=C1;S.ck2=C2;S.ck3=C3;S.ck4=C4;S.t1=T1;S.t2=T2;S.t3=T3;S.t4=T4;S.ckv=CKV}}
 const CHECKLISTS=[['1','Khung phụ'],['2','Khung chính'],['3','Vách kính phòng tắm'],['4','Lan can']];
 const ckSelect=(value,attrs='')=>`<select ${attrs}>${CHECKLISTS.map(([v,n])=>`<option value="${v}" ${String(value||'1')===v?'selected':''}>${n}</option>`).join('')}</select>`;
-const COLS=[['ten','Tên công việc','Nghiệm thu lắp đặt'],['ma','Mã công tác','PO-4,5,6'],['hm','Hạng mục',''],['vt','Vị trí',''],['gui','Ngày gửi YCNT','d'],['ns','NTNB bắt đầu','13h00'],['ne','NTNB kết thúc','14h00'],['nd','Ngày NTNB','d'],['ts','NT bắt đầu','14h00'],['te','NT kết thúc','15h00'],['td','Ngày NT','d'],['so','Số biên bản (trống = STT)',''],['bv','Bản vẽ tham chiếu','GMA.Q1.E&C-SDS-043-REV-01'],['tg','TVGS viên',''],['gs','Cán bộ KT hiện trường',''],['ck','Mẫu checklist','1'],['thap','Tháp',''],['tang','Tầng',''],['loai','Nghiệm thu gì',''],['ct','Đối tượng đã NT / tổng',''],['can','Căn hộ',''],['evid','Mã ghi sổ',''],['posted','Đã ghi lũy kế',''],['ghichu','Ghi chú nghiệm thu','']];
+const COLS=[['ten','Tên công việc','Nghiệm thu lắp đặt'],['ma','Mã công tác','PO-4,5,6'],['hm','Hạng mục',''],['vt','Vị trí',''],['gui','Ngày gửi YCNT','d'],['ns','Thời gian NTNB bắt đầu','13h00'],['ne',' Thời gian NTNB kết thúc','14h00'],['nd','Ngày NTNB','d'],['ts','NTCV bắt đầu','14h00'],['te','NTCV kết thúc','15h00'],['td','Ngày NTCV','d'],['so','Số biên bản ',''],['bv','Bản vẽ tham chiếu','GMA.Q1.E&C-SDS-043-REV-01'],['tg','TVGS viên',''],['gs','Cán bộ KT hiện trường',''],['ck','Mẫu checklist','1'],['thap','Tháp',''],['tang','Tầng',''],['loai','Nghiệm thu gì',''],['ct','Đối tượng đã NT / tổng',''],['can','Căn hộ',''],['evid','Mã ghi sổ',''],['posted','Đã ghi lũy kế',''],['ghichu','Ghi chú nghiệm thu','']];
 const mig3=()=>{if(S.ck3==C3_OLD)S.ck3=C3;if(S.t3=='LAN CAN VÀ KÍNH PHÒNG TẮM // RAILING AND SHOWER GLASS INSTALLATION')S.t3='VÁCH KÍNH PHÒNG TẮM // SHOWER SCREEN INSTALLATION'};
 let S;
 if(!S)S={g:{},rows:[],ck1:C1,ck2:C2,ck3:C3,ck4:C4,t4:T4,t1:T1,t2:T2,t3:T3,ckv:CKV,vl:VL};
@@ -275,6 +336,12 @@ const $=i=>document.getElementById(i),ls=()=>{try{if(UID)localStorage.setItem('h
 const nr=()=>{const r={};COLS.forEach(c=>r[c[0]]=c[2]=='d'?'':c[2]);return r};
 const HID=['thap','tang','loai','ct','can','evid','posted','ghichu'],GRID=()=>COLS.filter(c=>HID.indexOf(c[0])<0);
 const RECORD_CLASSES=['Khung chính','Khung phụ','Lan can','Vách kính'];
+const ENTRY_GROUPS=[
+{title:'Thông tin biên bản',fields:['ten','ma','hm','vt','thap','tang','can','loai']},
+{title:'Thời gian nghiệm thu',fields:['gui','ns','ne','nd','ts','te','td']},
+{title:'Hồ sơ và nội dung',fields:['so','bv','tg','gs','ck','ct','ghichu']}
+];
+let compactEntry=true,editingRecord=null;
 let nextRecordNumbers={};
 const TABLE_FILTERS={},QF_TABLE_FILTERS={};
 let selectedRecordClass='';
@@ -288,10 +355,28 @@ if(text.includes('vach kinh'))return'Vách kính';
 if(text.includes('khung phu')||text.includes('grouting khung phu')||text.includes('subframe'))return'Khung phụ';
 if(text.includes('khung chinh')||text.includes('mainframe'))return'Khung chính';
 return'Khác'}
+function nextRecordNumberForClass(category){
+let max=null,hasRows=false;
+S.rows.forEach((row,index)=>{
+if(recordClass(row)!==category)return;
+hasRows=true;
+const value=String(row.so||'').trim(),number=value?(/^\d+$/.test(value)?Number(value):NaN):index+1;
+if(Number.isSafeInteger(number)&&number>=0)max=max===null?number:Math.max(max,number)});
+return hasRows?(max===null?undefined:max+1):nextRecordNumbers[category]}
 function tableColumnValue(row,index,key){
 if(key==='__class')return recordClass(row);
 if(key==='__stt')return String(index+1);
+if(key==='__work')return[row.ten,row.hm,row.ma].filter(Boolean).join(' · ');
+if(key==='__location')return[row.vt,row.thap,row.tang].filter(Boolean).join(' · ');
+if(key==='__internal')return[row.nd,row.ns,row.ne].filter(Boolean).join(' · ');
+if(key==='__acceptance')return[row.td,row.ts,row.te].filter(Boolean).join(' · ');
 return String(row[key]||'')}
+function compactPlace(row){
+const main=String(row.vt||'').trim()||[row.thap,row.tang,row.can].filter(Boolean).join(' · ');
+const mainNorm=filterNorm(main),extra=[row.thap,row.tang,row.can].filter(value=>value&&
+!mainNorm.includes(filterNorm(value))).join(' · ');
+return{main:main||'—',extra:extra}
+}
 function rowMatchesFilters(row,index){
 if(selectedRecordClass&&recordClass(row)!==selectedRecordClass)return false;
 return Object.entries(TABLE_FILTERS).every(([key,values])=>values.includes(tableColumnValue(row,index,key)))}
@@ -309,7 +394,7 @@ if(tableSort.key)rows.sort((a,b)=>tableColumnValue(a.row,a.index,tableSort.key).
 return rows}
 function renderRecordClasses(){
 const container=$('record-class-buttons');if(!container)return;
-container.innerHTML=RECORD_CLASSES.map(category=>{const next=nextRecordNumbers[category];return `<button type="button" class="s class-number-button${selectedRecordClass===category?' active':''}" data-class-filter="${esc(category)}">${esc(category)} · BB tiếp theo: ${Number.isInteger(next)?next:'Chưa có dữ liệu tổng hợp'}</button>`}).join('')+
+container.innerHTML=RECORD_CLASSES.map(category=>{const next=nextRecordNumberForClass(category);return `<button type="button" class="s class-number-button${selectedRecordClass===category?' active':''}" data-class-filter="${esc(category)}">${esc(category)} · Biên bản tiếp theo: ${Number.isInteger(next)?next:'Chưa có dữ liệu tổng hợp'}</button>`}).join('')+
 (selectedRecordClass?'<button type="button" class="s" data-class-filter="">Bỏ lọc hạng mục</button>':'')}
 function applyNextRecordNumbers(numbers){
 if(!numbers||typeof numbers!=='object')return;
@@ -339,13 +424,42 @@ menu.style.left=left+'px';menu.style.top=top+'px'}
 function ui0(){
 $('gl').innerHTML=GF.map(f=>`<div><label>${f[1]}</label><input data-g="${f[0]}" value="${esc(S.g[f[0]])}"></div>`).join('')+`<div style="grid-column:1/-1"><label>Tài liệu nghiệm thu vật liệu – mỗi dòng "Số/No | Ngày" (dùng cho BBNT nội bộ)</label><textarea id="vl">${esc(S.vl)}</textarea></div>`;
 $('ck1').value=S.ck1;$('ck2').value=S.ck2;$('ck3').value=S.ck3;$('ck4').value=S.ck4;$('ckt1').value=S.t1;$('ckt2').value=S.t2;$('ckt3').value=S.t3;$('ckt4').value=S.t4;
-const columns=[['__stt','STT'],['__class','Nhóm biên bản'],...GRID().map(c=>[c[0],c[1]])];
-$('th').innerHTML='<tr>'+columns.map(([key,title])=>`<th><div class="filter-head"><span>${title}</span>${key==='__class'?'':`<button type="button" data-filter-key="${key}" aria-label="Lọc ${title}" title="Lọc ${title}">▼</button>`}</div></th>`).join('')+'<th></th></tr>';
+const compactColumns=[['__stt','STT'],['__work','Tên công việc · Hạng mục'],['__location','Vị trí'],['gui','Ngày gửi'],['__internal','Nghiệm thu nội bộ'],['__acceptance','Nghiệm thu TVGS'],['__actions','Thao tác']];
+const columns=compactEntry?compactColumns:[['__stt','STT'],['__class','Nhóm biên bản'],...GRID().map(c=>[c[0],c[1]])];
+$('entry-table').classList.toggle('compact',compactEntry);
+$('entry-layout-toggle').textContent=compactEntry?'Hiện bảng đầy đủ':'Dùng giao diện gọn';
+$('entry-layout-toggle').setAttribute('aria-pressed',String(compactEntry));
+$('th').innerHTML='<tr>'+columns.map(([key,title])=>`<th><div class="filter-head"><span>${title}</span>${key==='__class'||key==='__actions'?'':`<button type="button" data-filter-key="${key}" aria-label="Lọc ${title}" title="Lọc ${title}">▼</button>`}</div></th>`).join('')+'</tr>';
 const rows=filteredRows();
-$('tb').innerHTML=rows.slice(VA-1,VB).map(({row:r,index:i})=>`<tr data-index="${i}"><td class="n">${i+1}</td><td class="n">${esc(recordClass(r))}</td>${GRID().map(c=>`<td>${c[0]=='ck'?ckSelect(r[c[0]],`data-r="${i}" data-k="${c[0]}"`):`<input data-r="${i}" data-k="${c[0]}" ${c[2]=='d'?'type="date"':''} value="${esc(r[c[0]])}">`}</td>`).join('')}<td class="n"><button class="s" data-dup="${i}">Nhân bản</button> <button class="s" data-del="${i}">Xóa</button></td></tr>`).join('');
+$('tb').innerHTML=rows.slice(VA-1,VB).map(({row:r,index:i})=>{
+const main=compactEntry
+?`<tr data-index="${i}"><td class="n">${i+1}</td><td class="compact-work"><span class="compact-main">${esc(r.ten||'—')}</span><small class="compact-sub">${esc([r.hm,r.ma].filter(Boolean).join(' · ')||recordClass(r))}</small></td><td class="compact-location"><span class="compact-main">${esc(compactPlace(r).main)}</span><small class="compact-sub">${esc(compactPlace(r).extra)}</small></td><td class="compact-date">${esc(F2(r.gui)||'—')}</td><td class="compact-internal"><span class="compact-main">${esc(F2(r.nd)||'Ngày chưa nhập')}</span><small class="compact-sub">${esc([r.ns,r.ne].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small></td><td class="compact-acceptance"><span class="compact-main">${esc(F2(r.td)||'Ngày chưa nhập')}</span><small class="compact-sub">${esc([r.ts,r.te].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small></td><td class="compact-actions"><button type="button" class="s" data-edit="${i}" aria-expanded="${editingRecord===i}">${editingRecord===i?'Đóng':'✎ Sửa'}</button> <button type="button" class="s" data-dup="${i}" aria-label="Nhân bản biên bản ${i+1}" title="Nhân bản">⧉</button> <button type="button" class="s" data-del="${i}" aria-label="Xóa biên bản ${i+1}" title="Xóa">×</button></td></tr>`
+:`<tr data-index="${i}"><td class="n">${i+1}</td><td class="n">${esc(recordClass(r))}</td>${GRID().map(c=>`<td>${c[0]=='ck'?ckSelect(r[c[0]],`data-r="${i}" data-k="${c[0]}"`):`<input data-r="${i}" data-k="${c[0]}" ${c[2]=='d'?'type="date"':''} value="${esc(r[c[0]])}">`}</td>`).join('')}<td class="n"><button class="s" data-dup="${i}">Nhân bản</button> <button class="s" data-del="${i}">Xóa</button></td></tr>`;
+const editor=compactEntry&&editingRecord===i?renderCompactEditor(r,i,columns.length):'';
+return main+editor
+}).join('');
 renderRecordClasses();
 document.querySelectorAll('#th [data-filter-key]').forEach(button=>button.classList.toggle('filtered',Object.prototype.hasOwnProperty.call(TABLE_FILTERS,button.dataset.filterKey)));
 photoEditorRender();
+}
+function renderCompactEditor(row,index,columnCount){
+const fields=ENTRY_GROUPS.map(group=>`<section class="compact-group"><h3>${group.title}</h3><div class="compact-fields">${group.fields.map(key=>{
+const column=COLS.find(item=>item[0]===key),wide=key==='ct'||key==='ghichu';
+const attrs=`data-r="${index}" data-k="${key}"`;
+const control=key==='ck'?ckSelect(row[key],attrs):wide?`<textarea ${attrs}>${esc(row[key]||'')}</textarea>`:`<input ${attrs} ${column[2]==='d'?'type="date"':''} value="${esc(row[key]||'')}">`;
+return `<div class="compact-field${wide?' wide':''}"><label>${column[1]}</label>${control}</div>`
+}).join('')}</div></section>`).join('');
+return `<tr class="compact-edit-row" data-editor-for="${index}"><td colspan="${columnCount}"><div class="compact-edit-panel">${fields}<button type="button" class="s compact-close" data-edit="${index}" aria-expanded="true">Đóng phần sửa</button></div></td></tr>`
+}
+function updateCompactSummaryRow(index){
+if(!compactEntry)return;
+const row=S.rows[index],element=document.querySelector(`#tb tr[data-index="${index}"]`);
+if(!row||!element)return;
+element.querySelector('.compact-work').innerHTML=`<span class="compact-main">${esc(row.ten||'—')}</span><small class="compact-sub">${esc([row.hm,row.ma].filter(Boolean).join(' · ')||recordClass(row))}</small>`;
+element.querySelector('.compact-location').innerHTML=`<span class="compact-main">${esc(compactPlace(row).main)}</span><small class="compact-sub">${esc(compactPlace(row).extra)}</small>`;
+element.querySelector('.compact-date').textContent=F2(row.gui)||'—';
+element.querySelector('.compact-internal').innerHTML=`<span class="compact-main">${esc(F2(row.nd)||'Ngày chưa nhập')}</span><small class="compact-sub">${esc([row.ns,row.ne].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small>`;
+element.querySelector('.compact-acceptance').innerHTML=`<span class="compact-main">${esc(F2(row.td)||'Ngày chưa nhập')}</span><small class="compact-sub">${esc([row.ts,row.te].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small>`;
 }
 const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 function photoSignature(row){return JSON.stringify([row.ma,row.so,row.gui,row.td,row.vt,row.hm,row.loai,row.ten].map(value=>String(value||'').trim()))}
@@ -372,6 +486,10 @@ row.photoReport.images=[0,1,2,3].map(index=>String(row.photoReport.images[index]
 ['attachment','comment','distribution'].forEach(key=>{if(typeof row.photoReport[key]!=='string')row.photoReport[key]=''});
 if(row._photoKey&&photoStore[row._photoKey]&&!row.photoReport.images.some(Boolean)&&!row.photoReport.comment&&!row.photoReport.attachment&&!row.photoReport.distribution)row.photoReport=Object.assign(row.photoReport,photoStore[row._photoKey]);
 return row.photoReport}
+function clonePhotoReport(report,empty){
+if(empty)return{images:['','','',''],attachment:'',comment:'',distribution:''};
+return{images:[0,1,2,3].map(index=>String(report&&report.images&&report.images[index]||'')),
+attachment:String(report&&report.attachment||''),comment:String(report&&report.comment||''),distribution:String(report&&report.distribution||'')}}
 function savePhotoReport(row){
 const status=$('photo-status');
 photoStore[row._photoKey]=photoReportFor(row);
@@ -381,7 +499,7 @@ function photoEditorRender(){
 const select=$('photo-row');if(!select)return;
 ensurePhotoKeys();loadPhotoStore();
 S.rows.forEach(row=>photoReportFor(row));
-select.innerHTML=S.rows.map((row,index)=>`<option value="${index}">STT ${index+1} · ${esc(row.ma||row.ten||'Biên bản')} · ${esc(row.hm||'')}</option>`).join('');
+select.innerHTML=S.rows.map((row,index)=>`<option value="${index}">STT ${index+1} · ${esc(row.ma||row.ten||'Biên bản')} · ${esc(row.hm||'')} · ${esc(row.vt||'')}</option>`).join('');
 if(!S.rows.length){select.innerHTML='<option value="">Chưa có biên bản</option>';select.disabled=true;document.querySelectorAll('[data-photo-image],[data-photo-field],[data-photo-clear]').forEach(input=>input.disabled=true);$('photo-status').textContent='Thêm hoặc tải biên bản trước khi nhập ảnh.';return}
 select.disabled=false;
 document.querySelectorAll('[data-photo-image],[data-photo-field],[data-photo-clear]').forEach(input=>input.disabled=false);
@@ -409,6 +527,14 @@ if(!blob||blob.size>150*1024)throw new Error('Không thể nén ảnh xuống d�
 return await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(new Error('Không đọc được ảnh đã chọn.'));reader.readAsDataURL(blob)})
 }finally{bitmap.close()}}
 document.getElementById('photo-row').addEventListener('change',event=>{cur=Number(event.target.value)||0;document.querySelector('.ty[value="p"]').checked=true;photoEditorRender();ap()});
+document.getElementById('photo-print-current').addEventListener('click',()=>{
+if(!S.rows.length)return;
+const index=Math.max(0,Math.min(Number($('photo-row').value)||0,S.rows.length-1));
+cur=index;
+document.querySelector('.ty[value="p"]').checked=true;
+$('rng').value=String(index+1);
+if(build(true))fit().then(()=>setTimeout(()=>window.print(),150))
+});
 document.getElementById('photo-entry').addEventListener('change',async event=>{
 const input=event.target;if(!input.matches('[data-photo-image]'))return;
 const file=input.files&&input.files[0];if(!file)return;
@@ -444,7 +570,7 @@ closeExcelFilter();if(target==='qf')qfApplyTableFilters();else{VA=1;ui()}
 }});
 document.addEventListener('change',event=>{
 if(event.target.matches('#excel-filter-menu [data-filter-value]')){const value=event.target.dataset.filterValue;if(event.target.checked)filterDraft.selected.add(value);else filterDraft.selected.delete(value)}
-if(event.target.matches('[data-r][data-k]'))ui()
+if(event.target.matches('[data-r][data-k]')){const index=Number(event.target.dataset.r),key=event.target.dataset.k;if(event.target.tagName==='SELECT'){S.rows[index][key]=event.target.value;sv()}ui()}
 });
 document.addEventListener('input',event=>{
 if(!event.target.matches('#excel-filter-menu [data-filter-search]'))return;
@@ -453,12 +579,18 @@ document.querySelectorAll('#excel-filter-menu .excel-filter-option').forEach(opt
 });
 document.getElementById('reset-table-filters').onclick=()=>{Object.keys(TABLE_FILTERS).forEach(key=>delete TABLE_FILTERS[key]);Object.keys(QF_TABLE_FILTERS).forEach(key=>delete QF_TABLE_FILTERS[key]);selectedRecordClass='';tableSort={key:'',direction:1};qfApplyTableFilters();VA=1;ui()};
 document.addEventListener('input',e=>{const t=e.target;if(t.closest('#excel-filter-menu'))return;
-if(t.dataset.g)S.g[t.dataset.g]=t.value;else if(t.dataset.r!=null){S.rows[t.dataset.r][t.dataset.k]=t.value;const row=document.querySelector(`#tb tr[data-index="${t.dataset.r}"]`);if(row){row.cells[1].textContent=recordClass(S.rows[t.dataset.r]);row.hidden=!rowMatchesFilters(S.rows[t.dataset.r],Number(t.dataset.r))}renderRecordClasses();vr()}
+if(t.dataset.g)S.g[t.dataset.g]=t.value;else if(t.dataset.r!=null){S.rows[t.dataset.r][t.dataset.k]=t.value;const row=document.querySelector(`#tb tr[data-index="${t.dataset.r}"]`);if(row){if(compactEntry)updateCompactSummaryRow(Number(t.dataset.r));else row.cells[1].textContent=recordClass(S.rows[t.dataset.r]);row.hidden=!rowMatchesFilters(S.rows[t.dataset.r],Number(t.dataset.r))}renderRecordClasses();vr()}
 else if(t.id=='vl')S.vl=t.value;else if(t.id=='ck1')S.ck1=t.value;else if(t.id=='ck2')S.ck2=t.value;else if(t.id=='ck3')S.ck3=t.value;else if(t.id=='ck4')S.ck4=t.value;else if(t.id=='ckt1')S.t1=t.value;else if(t.id=='ckt2')S.t2=t.value;else if(t.id=='ckt3')S.t3=t.value;else if(t.id=='ckt4')S.t4=t.value;sv()});
-document.addEventListener('click',e=>{const t=e.target;
-if(t.dataset.del!=null){const idx=Number(t.dataset.del);if(!confirm('Xóa dòng '+(idx+1)+'? Thay đổi sẽ được đồng bộ lên Google Sheet.'))return;S.rows.splice(idx,1);sv();ui()}
-if(t.dataset.dup!=null){S.rows.splice(+t.dataset.dup+1,0,{...S.rows[t.dataset.dup]});sv();ui()}});
-$('add').onclick=()=>{const l=S.rows[S.rows.length-1];S.rows.push(l?{...l,so:''}:nr());cur=S.rows.length-1;if(S.rows.length>VB){const w=VB-VA;VB=S.rows.length;VA=Math.max(1,VB-w)}sv();ui()};
+document.getElementById('entry-layout-toggle').addEventListener('click',()=>{
+compactEntry=!compactEntry;
+editingRecord=null;
+ui()
+});
+document.addEventListener('click',e=>{const t=e.target.closest('[data-edit]')||e.target;
+if(t.dataset.edit!=null){const index=Number(t.dataset.edit);editingRecord=editingRecord===index?null:index;ui();return}
+if(t.dataset.del!=null){const idx=Number(t.dataset.del);if(!confirm('Xóa dòng '+(idx+1)+'? Thay đổi sẽ được đồng bộ lên Google Sheet.'))return;S.rows.splice(idx,1);if(editingRecord===idx)editingRecord=null;else if(editingRecord>idx)editingRecord--;sv();ui()}
+if(t.dataset.dup!=null){const idx=Number(t.dataset.dup),original=S.rows[idx],copy={...original,photoReport:clonePhotoReport(photoReportFor(original),false)};delete copy._photoKey;S.rows.splice(idx+1,0,copy);if(editingRecord>idx)editingRecord++;sv();ui()}});
+$('add').onclick=()=>{const l=S.rows[S.rows.length-1],row=l?{...l,so:'',photoReport:clonePhotoReport(null,true)}:nr();delete row._photoKey;S.rows.push(row);cur=S.rows.length-1;if(S.rows.length>VB){const w=VB-VA;VB=S.rows.length;VA=Math.max(1,VB-w)}sv();ui()};
 $('clr').onclick=()=>{if(confirm('Xóa toàn bộ dòng dữ liệu trên giao diện và đồng bộ danh sách mới lên Google Sheet?')){S.rows=[];sv();ui()}};
 $('paste').onclick=()=>{const t=prompt('Dán các dòng copy từ Excel (đúng thứ tự cột như bảng, ngày dạng dd/mm/yyyy):');if(!t)return;
 t.split(/\r?\n/).filter(x=>x.trim()).forEach(l=>{const v=l.split('\t'),r=nr();COLS.forEach((c,i)=>{let x=(v[i]||'').trim();if(c[2]=='d'){const m=x.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);x=m?`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`:''}r[c[0]]=x||r[c[0]]});S.rows.push(r)});sv();ui()};
@@ -511,14 +643,14 @@ const ex=avail-used();if(ex>2&&rows.length){const add=ex/rows.length;rows.forEac
 function pict(r,i){
 const report=photoReportFor(r),images=report.images.map((src,index)=>`<figure class="photo-item">${src?`<img src="${esc(src)}" alt="Ảnh nghiệm thu ${index+1}">`:`<div class="photo-placeholder">CHƯA CHÈN ẢNH ${index+1}</div>`}<figcaption>HÌNH ẢNH NGHIỆM THU CÔNG VIỆC</figcaption></figure>`).join('');
 const position=esc(r.vt||'');
-return `<div class="pg photo-report">${FC()}<table class="photo-head"><colgroup><col style="width:15%"><col style="width:60%"><col style="width:25%"></colgroup><tr><td rowspan="2" class="photo-logo"><img src="${LOGO}" alt="The Grand Manhattan"></td><td class="photo-project">DỰ ÁN/PROJECT:${esc(G().duan)}</td><td rowspan="2" class="photo-company">E&amp;C</td></tr><tr><td class="photo-title"><b>HÌNH ẢNH NGHIỆM THU</b><i>PICTURES OF INSPECTION</i></td></tr></table><table class="photo-info"><colgroup><col style="width:15%"><col style="width:45%"><col style="width:15%"><col style="width:25%"></colgroup><tr><td class="photo-label">Chủ đầu tư<small>Investor</small></td><td class="photo-value">${esc(G().cdt)}</td><td class="photo-label">Mã dự án<small>Project code</small></td><td>${esc(G().pd)}</td></tr><tr><td class="photo-label">Tư vấn giám sát<small>Consultant</small></td><td class="photo-value">${esc(G().tv)}</td><td rowspan="2" class="photo-label photo-doc">Số hồ sơ<small>DOC No</small></td><td rowspan="2" class="photo-doc-value">${esc(mb(r,i))}</td></tr><tr><td class="photo-label">Nhà thầu<small>Contractor</small></td><td class="photo-value">${esc(G().nt)}</td></tr></table><table class="photo-locations"><colgroup><col style="width:17%"><col style="width:33%"><col style="width:17%"><col style="width:33%"></colgroup><tr><td class="photo-label">VỊ TRÍ NGHIỆM THU<small>INSPECTION LOCATION</small></td><td class="photo-value">${position}</td><td class="photo-label">BẢN VẼ THAM KHẢO:<small>DRAWING REFERENCE:</small></td><td class="photo-value">${esc(r.bv||'')}</td></tr><tr><td class="photo-label">HẠNG MỤC NGHIỆM THU<small>INSPECTION ITEM</small></td><td class="photo-value photo-item-value">${esc(nd(r))}</td><td class="photo-label">ĐÍNH KÈM<small>ATTACHMENT</small></td><td class="photo-value">${esc(report.attachment)}</td></tr></table><div class="photo-grid">${images}</div><div class="photo-result">- Kết quả: đạt đánh dấu √, không đạt đánh dấu X, không áp dụng đánh NA.<br>- Result: passed marked with √, failed marked with X, not available marked with NA.</div><div class="photo-comments"><b>Ý kiến / Comment:</b><p>${esc(report.comment)}</p></div><table class="photo-signatures"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><tr><td>Bên mời nghiệm thu<br>Inspected &amp; Submitted by</td><td>Bên nghiệm thu<br>Inspected by</td></tr><tr><td class="photo-name">Tên / Name: ${esc(G().kt||r.gs||'')}</td><td class="photo-name">Tên / Name: ${esc(tg(r))}</td></tr><tr><td class="photo-name">Chức vụ / Position: Cán bộ kỹ thuật</td><td class="photo-name">Chức vụ / Position: ${esc(G().tgc||'')}</td></tr><tr><td class="photo-sign">Chữ ký / Signature:</td><td class="photo-sign">Chữ ký / Signature:</td></tr><tr><td class="photo-date">Ngày / Date: ${esc(Fz(r.td))}</td><td class="photo-date">Ngày / Date: ${esc(Fz(r.td))}</td></tr></table><div class="photo-distribution">Phân phối / Distribution: ${esc(report.distribution)}</div></div>`}
+return `<div class="pg photo-report">${FC()}<table class="photo-head"><colgroup><col style="width:15%"><col style="width:60%"><col style="width:25%"></colgroup><tr><td rowspan="2" class="photo-logo"><img src="${LOGO}" alt="The Grand Manhattan"></td><td class="photo-project">DỰ ÁN/PROJECT:${esc(G().duan)}</td><td rowspan="2" class="photo-company">E&amp;C</td></tr><tr><td class="photo-title"><b>HÌNH ẢNH NGHIỆM THU</b><i>PICTURES OF INSPECTION</i></td></tr></table><table class="photo-info"><colgroup><col style="width:15%"><col style="width:45%"><col style="width:15%"><col style="width:25%"></colgroup><tr><td class="photo-label">Chủ đầu tư<small>Investor</small></td><td class="photo-value">${esc(G().cdt)}</td><td class="photo-label">Mã dự án<small>Project code</small></td><td>${esc(G().pd)}</td></tr><tr><td class="photo-label">Tư vấn giám sát<small>Consultant</small></td><td class="photo-value">${esc(G().tv)}</td><td rowspan="2" class="photo-label photo-doc">Số hồ sơ<small>DOC No</small></td><td rowspan="2" class="photo-doc-value">${esc(mb(r,i))}</td></tr><tr><td class="photo-label">Nhà thầu<small>Contractor</small></td><td class="photo-value">${esc(G().nt)}</td></tr></table><table class="photo-locations"><colgroup><col style="width:17%"><col style="width:33%"><col style="width:17%"><col style="width:33%"></colgroup><tr><td class="photo-label">VỊ TRÍ NGHIỆM THU<small>INSPECTION LOCATION</small></td><td class="photo-value">${position}</td><td class="photo-label">BẢN VẼ THAM KHẢO:<small>DRAWING REFERENCE:</small></td><td class="photo-value">${esc(r.bv||'')}</td></tr><tr><td class="photo-label">HẠNG MỤC NGHIỆM THU<small>INSPECTION ITEM</small></td><td class="photo-value photo-item-value">${esc(nd(r))}</td><td class="photo-label">ĐÍNH KÈM<small>ATTACHMENT</small></td><td class="photo-value">${esc(report.attachment)}</td></tr></table><div class="photo-grid">${images}</div><div class="photo-result">- Kết quả: đạt đánh dấu √, không đạt đánh dấu X, không áp dụng đánh NA.<br>- Result: passed marked with √, failed marked with X, not available marked with NA.</div><div class="photo-comments"><b>Ý kiến / Comment:</b><p>${esc(report.comment)}</p></div><table class="photo-signatures"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><tr><td>Bên mời nghiệm thu<br>Inspected &amp; Submitted by</td><td>Bên nghiệm thu<br>Inspected by</td></tr><tr><td class="photo-name">Tên / Name: ${esc(r.gs||G().kt||'')}</td><td class="photo-name">Tên / Name: ${esc(tg(r))}</td></tr><tr><td class="photo-name">Chức vụ / Position: Cán bộ kỹ thuật</td><td class="photo-name">Chức vụ / Position: ${esc(G().tgc||'')}</td></tr><tr><td class="photo-sign">Chữ ký / Signature:</td><td class="photo-sign">Chữ ký / Signature:</td></tr><tr><td class="photo-date">Ngày / Date: ${esc(Fz(r.td))}</td><td class="photo-date">Ngày / Date: ${esc(Fz(r.td))}</td></tr></table><div class="photo-distribution">Phân phối / Distribution: ${esc(report.distribution)}</div></div>`}
 const FN={y:ycnt,n:nb,b:bb,c:ck,p:pict};
 function sel(){const n=S.rows.length,t=$('rng').value.trim(),o=new Set();
 if(!t)for(let i=0;i<n;i++)o.add(i);else t.split(/[,;\s]+/).forEach(p=>{const m=p.match(/^(\d+)(?:-(\d+))?$/);if(m){const a=+m[1],b=+(m[2]||m[1]);for(let k=Math.min(a,b);k<=Math.max(a,b);k++)if(k>=1&&k<=n)o.add(k-1)}});
 return[...o].sort((a,b)=>a-b)}
 ui();
 
-const CFG0={url:'https://script.google.com/macros/s/AKfycbyUM5o_85v2VVpHAYIxSVXssF3iK_NuKvvsS6G6kXTWnW16pI2AKxXYcIxGinLhFQl_Lg/exec'}; /* điền sẵn URL Web App ở đây nếu đưa trang lên web cho cả team */
+const CFG0={url:'https://script.google.com/macros/s/AKfycbyQlHnWuaS5MTCezYLbu-ID9ibPnK4gvWwq5Z9t2VNn4tloVsWQ56kglSUe_Jy3VxjT/exec'}; /* điền sẵn URL Web App ở đây nếu đưa trang lên web cho cả team */
 const OLD_CFG_URL='https://script.google.com/macros/s/AKfycbx13YZZxkbggnueggZf7EtUpNyInAvTWKjy6i2xlAujfolrawzLkA4Wetn-d3TvwpIr/exec';
 let CF={};try{CF=JSON.parse(localStorage.getItem('hsnt_cfg'))||{}}catch(e){}if(CF.url===OLD_CFG_URL)CF.url=CFG0.url;CF=Object.assign({},CFG0,CF);
 var TK='',UID='',UNAME='',REV=0,FORCE=false;
@@ -541,7 +673,7 @@ if(!ix.length){st.textContent='Không có STT phù hợp.';$('pv').innerHTML='';
 if(full&&ty.includes('p')){
 const missing=ix.find(index=>photoReportFor(S.rows[index]).images.some(image=>!image));
 if(missing!=null){st.textContent=`Biên bản STT ${missing+1}: cần nhập đủ Ảnh 1, Ảnh 2, Ảnh 3 và Ảnh 4.`;$('photo-row').value=String(missing);cur=missing;photoEditorRender();$('pv').innerHTML='';return 0}}
-let h=[];if($('ord').value=='r')ix.forEach(i=>ty.forEach(t=>h.push(FN[t](S.rows[i],i))));else ty.forEach(t=>ix.forEach(i=>h.push(FN[t](S.rows[i],i))));
+let h=[];const pu=(t,i)=>{const x=FN[t](S.rows[i],i);Array.isArray(x)?h.push(...x):h.push(x)};if($('ord').value=='r')ix.forEach(i=>ty.forEach(t=>pu(t,i)));else ty.forEach(t=>ix.forEach(i=>pu(t,i)));
 const tot=h.length;if(!full&&tot>12)h=h.slice(0,12);
 $('pv').innerHTML=h.join('');ahf();if(!full)fit();
 st.textContent=`Xem trước STT ${ix.length>6?ix[0]+1+'…'+(ix[ix.length-1]+1):ix.map(i=>i+1).join(', ')} · ${h.length}/${tot} trang`+(!full&&blank?' (đang theo dòng bạn nhập; để trống ô số thứ tự thì xuất PDF in tất cả)':'');return h.length}
@@ -666,7 +798,7 @@ const qfK=()=>$('qt').value.replace('Tháp ','');
 const qfF=()=>+($('qg').value.replace('Tầng ',''));
 const qfKD=()=>$('qt').value==KD_T;
 function qfOpt(id,arr){const e=$(id),v=e.value;e.innerHTML=arr.map(x=>`<option>${esc(x)}</option>`).join('');if(v&&arr.indexOf(v)>=0)e.value=v}
-const QF=[['ma','Mã công tác'],['gui','Ngày gửi YCNT','date'],['ns','NTNB bắt đầu'],['ne','NTNB kết thúc'],['nd','Ngày NTNB','date'],['ts','NT bắt đầu'],['te','NT kết thúc'],['td','Ngày NT','date'],['so','Số biên bản (trống = STT)'],['bv','Bản vẽ tham chiếu'],['tg','TVGS viên'],['gs','Cán bộ KT hiện trường'],['ck','Mẫu checklist']];
+const QF=[['ma','Mã hồ sơ'],['gui','Ngày gửi YCNT','date'],['ns','NTNB bắt đầu'],['ne','NTNB kết thúc'],['nd','Ngày NTNB','date'],['ts','NT bắt đầu'],['te','NT kết thúc'],['td','Ngày NT','date'],['so','Số biên bản (trống = STT)'],['bv','Bản vẽ tham chiếu'],['tg','TVGS viên'],['gs','Cán bộ KT hiện trường'],['ck','Mẫu checklist']];
 let QI={},qTenT=false;
 function qfInfoRender(){$('qinfo').innerHTML='<div><label>Tên công việc</label><input id="qten"></div>'+QF.map(f=>`<div><label>${f[1]}</label>${f[0]=='ck'?ckSelect(QI.ck,'data-qi="ck"'):`<input ${f[2]?'type="date"':''} data-qi="${f[0]}" value="${esc(QI[f[0]]||'')}">`}</div>`).join('');$('qten').value=qTenT?($('qten').dataset.v||''):''}
 function qfInfoLoad(){const l=S.rows[S.rows.length-1],d=nr();QI={};QF.forEach(f=>QI[f[0]]=l?(f[0]=='so'?'':(l[f[0]]||'')):d[f[0]]);qTenT=false;qfInfoRender()}
@@ -1383,4 +1515,206 @@ $('ai-input').addEventListener('keydown', e => {
     $('ai-btn').click();
   }
 });
-</script></body></html>
+</script>
+<script>
+/* ===== Thư viện tệp Google Drive + chèn PDF vào biên bản ===== */
+(function(){
+'use strict';
+const PDFJS_URL='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/',MAXMB=18,MAXPG=60;
+const DL={cur:{id:'',name:'Thư viện'}},TH=new Map(),PDF_PAGES=new Map(),PDF_BUSY=new Map(),PDF_ERR=new Map();
+async function dcall(act,p){
+ const r=await fetch(CF.url.trim(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action:act,token:TK},p))});
+ const j=await r.json();
+ if(!j.ok)throw new Error(j.error==='session'?'Phiên đăng nhập đã hết hạn, hãy đăng nhập lại.':(j.message||j.error||'Lỗi'));
+ return j}
+const b64=blob=>new Promise((ok,bad)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=()=>bad(new Error('Không đọc được tệp.'));r.readAsDataURL(blob)});
+function syncWhere(){document.querySelectorAll('.dl-where').forEach(x=>{x.textContent='“'+DL.cur.name+'”'})}
+async function prep(file){
+ if(/\.(exe|bat|cmd|msi|scr|js|vbs|ps1|jar|com)$/i.test(file.name))throw new Error('Không nhận tệp chương trình: '+file.name);
+ const raw={name:file.name,mime:file.type||'application/octet-stream',blob:file};
+ if(!file.type.startsWith('image/')||(file.size<=1.5*1048576&&/jpe?g|png|webp/.test(file.type)))return raw;
+ try{const bm=await createImageBitmap(file);
+  try{const sc=Math.min(1,2560/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*sc);c.height=Math.round(bm.height*sc);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
+   const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.85));if(!blob)return raw;
+   return{name:file.name.replace(/\.[^.]+$/,'')+'.jpg',mime:'image/jpeg',blob}}finally{bm.close()}}catch(e){return raw}}
+async function upload(file,folderId){
+ const p=await prep(file);if(p.blob.size>MAXMB*1048576)throw new Error('Tệp lớn hơn '+MAXMB+' MB.');
+ return (await dcall('drive_upload',{folderId:folderId||'',name:p.name,mime:p.mime,data:await b64(p.blob)})).file}
+async function getFile(m){
+ const j=await dcall('drive_get',{fileId:m.id}),bin=atob(j.data),u=new Uint8Array(bin.length);
+ for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+ return new File([u],j.name||m.name,{type:j.mime||m.mime})}
+
+function browser(host,opt){
+ const B={id:'',sel:new Map(),tok:0},G=()=>host.querySelector('.dl-grid'),msg=t=>{host.querySelector('.dl-msg').textContent=t||''};
+ const acc=opt.accept==='pdf'?'application/pdf':opt.accept==='image'?'image/*':'';
+ const fico=m=>m==='application/pdf'?'📄':m.startsWith('image/')?'🖼':/word/.test(m)?'📝':/sheet|excel/.test(m)?'📊':'📎',fsz=n=>n>1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB',fdt=t=>new Date(t).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+ host.classList.add('dl');
+ host.innerHTML=`<div class="dl-bar"><div class="dl-path"></div><button type="button" class="s" data-a="mk">📁 Tạo thư mục</button><label class="dl-up">⬆ Up dữ liệu từ máy<input type="file" multiple ${acc?`accept="${acc}"`:''} hidden></label><button type="button" class="s" data-a="rf" title="Tải lại">↻</button>${opt.pick?'':'<input class="dl-q" placeholder="🔍 Tìm theo tên…" style="max-width:180px"><a class="dl-gd" target="_blank" rel="noopener" hidden>↗ Mở trên Google Drive</a>'}</div><div class="dl-msg" role="status"></div><div class="dl-grid"></div>`;
+ B.msg=msg;
+ async function thumbs(list,tok){
+  const todo=list.filter(f=>!TH.has(f.id));let i=0;
+  const run=async()=>{while(i<todo.length){if(tok!==B.tok)return;const f=todo[i++];
+   try{const j=await dcall('drive_get',{fileId:f.id,thumb:1});if(j.data){const u=`data:${j.mime};base64,${j.data}`;TH.set(f.id,u);const el=host.querySelector(`[data-th="${CSS.escape(f.id)}"]`);if(el)el.innerHTML=`<img src="${u}" alt="">`}}catch(e){}}};
+  run();run()}
+ B.open=async function(id){
+  if(!TK){G().innerHTML='';msg('Hãy đăng nhập để dùng thư viện Drive.');return}
+  const tok=++B.tok;msg('Đang tải…');
+  try{
+   const j=await dcall('drive_list',{folderId:id||''});if(tok!==B.tok)return;
+   B.id=j.folderId;DL.cur={id:j.folderId,name:j.path[j.path.length-1].name};syncWhere();
+   host.querySelector('.dl-path').innerHTML=j.path.map((p,i)=>`<button type="button" data-a="go" data-id="${esc(p.id)}">${i?'':'🏠 '}${esc(p.name)}</button>`).join(' / ');
+   const fl=!opt.pick?j.files:j.files.filter(f=>opt.accept==='pdf'?f.mime==='application/pdf':opt.accept==='image'?f.mime.startsWith('image/'):true);
+   const gd=host.querySelector('.dl-gd');if(gd&&j.url){gd.href=j.url;gd.hidden=false}
+   if(opt.pick)G().innerHTML=j.folders.map(f=>`<div class="dl-it" data-a="go" data-id="${esc(f.id)}"><div class="dl-th">📁</div><span title="${esc(f.name)}">${esc(f.name)}</span></div>`).join('')
+    +fl.map(f=>`<div class="dl-it${B.sel.has(f.id)?' on':''}" data-a="pick" data-id="${esc(f.id)}" data-n="${esc(f.name)}" data-m="${esc(f.mime)}"><div class="dl-th" data-th="${esc(f.id)}">${TH.has(f.id)?`<img src="${TH.get(f.id)}" alt="">`:fico(f.mime)}</div><span title="${esc(f.name)}">${esc(f.name)}</span></div>`).join('');
+   else{
+    const rb=(f,d)=>`<button type="button" class="s" data-a="rm" data-id="${esc(f.id)}" data-n="${esc(f.name)}" ${d?'data-d="1"':''} title="Xóa (chuyển vào thùng rác Drive)">🗑</button>`;
+    G().innerHTML=`<div class="tw" style="max-height:60vh"><table class="dl-tb"><thead><tr><th>Tên</th><th>Dung lượng</th><th>Người up</th><th>Ngày up</th><th></th></tr></thead><tbody>`
+     +j.folders.map(f=>`<tr data-a="go" data-id="${esc(f.id)}" data-name="${esc(f.name.toLowerCase())}"><td>📁 <b>${esc(f.name)}</b></td><td></td><td></td><td></td><td>${rb(f,1)}</td></tr>`).join('')
+     +fl.map(f=>`<tr data-name="${esc(f.name.toLowerCase())}"><td>${fico(f.mime)} ${esc(f.name)}</td><td>${fsz(f.size)}</td><td>${esc(f.by||'')}</td><td>${fdt(f.at)}</td><td>${(f.mime==='application/pdf'||f.mime.startsWith('image/'))?`<button type="button" class="s" data-a="view" data-id="${esc(f.id)}" data-n="${esc(f.name)}" data-m="${esc(f.mime)}">Xem</button>`:''}<button type="button" class="s" data-a="dl" data-id="${esc(f.id)}" data-n="${esc(f.name)}" data-m="${esc(f.mime)}">Tải về</button>${rb(f,0)}</td></tr>`).join('')
+     +`</tbody></table></div>`}
+   msg(j.folders.length||fl.length?'':'Thư mục trống — bấm “Up dữ liệu từ máy” hoặc kéo thả tệp vào đây.');
+   if(opt.pick)thumbs(fl,tok)
+  }catch(e){if(id)return B.open('');if(tok===B.tok)msg('Lỗi: '+e.message)}};
+ B.upload=async function(files){
+  files=[...files];if(!files.length)return[];if(!TK){msg('Hãy đăng nhập trước.');return[]}
+  const out=[];
+  for(let i=0;i<files.length;i++){msg(`Đang tải lên ${i+1}/${files.length}: ${files[i].name}…`);
+   try{out.push(await upload(files[i],B.id))}catch(e){msg('Lỗi '+files[i].name+': '+e.message);break}}
+  if(out.length){await B.open(B.id);msg(`Đã tải lên ${out.length} tệp.`)}
+  return out};
+ host.addEventListener('click',async e=>{
+  const t=e.target.closest('[data-a]');if(!t||!host.contains(t))return;const a=t.dataset.a;
+  if(a==='rm'){e.stopPropagation();if(!confirm(`Xóa ${t.dataset.d?'thư mục':'tệp'} “${t.dataset.n}”? (chuyển vào thùng rác Drive)`))return;
+   try{await dcall('drive_trash',{id:t.dataset.id});B.sel.delete(t.dataset.id);B.open(B.id)}catch(er){msg('Lỗi: '+er.message)}return}
+  if(a==='go')B.open(t.dataset.id);
+  else if(a==='rf')B.open(B.id);
+  else if(a==='dl'||a==='view'){e.stopPropagation();msg('Đang lấy tệp…');
+   try{const f=await getFile({id:t.dataset.id,name:t.dataset.n,mime:t.dataset.m}),url=URL.createObjectURL(f);
+    if(a==='view'&&window.open(url,'_blank')){}else{const l=document.createElement('a');l.href=url;l.download=f.name;l.click()}
+    msg('');setTimeout(()=>URL.revokeObjectURL(url),120000)}catch(er){msg('Lỗi: '+er.message)}}
+  else if(a==='mk'){const n=(prompt('Tên thư mục mới:')||'').trim();if(!n)return;
+   try{const j=await dcall('drive_mkdir',{parentId:B.id,name:n});B.open(j.id)}catch(er){msg('Lỗi: '+er.message)}}
+  else if(a==='pick'&&opt.pick){const id=t.dataset.id;
+   if(B.sel.has(id))B.sel.delete(id);else{if(!opt.multi)B.sel.clear();B.sel.set(id,{id,name:t.dataset.n,mime:t.dataset.m})}
+   host.querySelectorAll('[data-a=pick]').forEach(x=>x.classList.toggle('on',B.sel.has(x.dataset.id)));opt.onSel&&opt.onSel(B.sel.size)}});
+ host.querySelector('input[type=file]').addEventListener('change',e=>{B.upload(e.target.files);e.target.value=''});
+ const q=host.querySelector('.dl-q');if(q)q.addEventListener('input',()=>{const k=q.value.trim().toLowerCase();host.querySelectorAll('tr[data-name]').forEach(r=>{r.hidden=!!k&&!r.dataset.name.includes(k)})});
+ if(!opt.pick)G().style.display='block';
+ host.addEventListener('dragover',e=>{e.preventDefault();host.classList.add('drag')});
+ host.addEventListener('dragleave',e=>{if(!host.contains(e.relatedTarget))host.classList.remove('drag')});
+ host.addEventListener('drop',e=>{e.preventDefault();host.classList.remove('drag');B.upload(e.dataTransfer.files)});
+ return B}
+
+let MO=null;
+function pick(opt){return new Promise(res=>{
+ if(!TK){alert('Hãy đăng nhập trước khi dùng thư viện Drive.');return res([])}
+ if(!MO){MO=document.createElement('dialog');MO.className='dl-modal np';document.body.appendChild(MO)}
+ MO.innerHTML=`<div class="dl-mh"><b>${esc(opt.title||'Chọn tệp')}</b><button type="button" class="s" data-x>✕</button></div><div class="dl-mb"></div><div class="dl-mf"><span class="dl-cnt">Bấm vào tệp để chọn${opt.multi?' (chọn được nhiều tệp)':''}.</span><button type="button" class="s" data-x>Hủy</button><button type="button" data-ok disabled>Chèn</button></div>`;
+ const ok=MO.querySelector('[data-ok]');let done=false;
+ const B=browser(MO.querySelector('.dl-mb'),{accept:opt.accept,pick:true,multi:!!opt.multi,onSel:n=>{ok.disabled=!n;MO.querySelector('.dl-cnt').textContent=n?`Đã chọn ${n} tệp.`:'Chưa chọn tệp nào.'}});
+ const fin=v=>{if(done)return;done=true;if(MO.open)MO.close();res(v)};
+ MO.onclick=e=>{if(e.target.closest('[data-x]'))fin([]);else if(e.target.closest('[data-ok]'))fin([...B.sel.values()])};
+ MO.onclose=()=>fin([]);MO.showModal();B.open(DL.cur.id)})}
+
+/* ---- PDF → ảnh trang để in kèm ---- */
+async function pdfLib(){
+ if(!window.pdfjsLib)await new Promise((ok,bad)=>{const s=document.createElement('script');s.src=PDFJS_URL+'pdf.min.js';s.onload=ok;s.onerror=()=>bad(new Error('Không tải được bộ đọc PDF (cần Internet).'));document.head.appendChild(s)});
+ if(!pdfjsLib.GlobalWorkerOptions.workerSrc){const w=await(await fetch(PDFJS_URL+'pdf.worker.min.js')).text();pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob([w],{type:'text/javascript'}))}
+ return pdfjsLib}
+async function renderPdf(id){
+ const j=await dcall('drive_get',{fileId:id}),bin=atob(j.data),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+ const lib=await pdfLib(),doc=await lib.getDocument({data:u}).promise,out=[],n=Math.min(doc.numPages,MAXPG);
+ for(let k=1;k<=n;k++){const pg=await doc.getPage(k),v0=pg.getViewport({scale:1}),v=pg.getViewport({scale:Math.min(1240/v0.width,1754/v0.height)}),c=document.createElement('canvas');
+  c.width=Math.ceil(v.width);c.height=Math.ceil(v.height);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);
+  await pg.render({canvasContext:x,viewport:v}).promise;out.push(c.toDataURL('image/jpeg',.85));c.width=c.height=0}
+ return out}
+function loadPdf(id){
+ if(PDF_PAGES.has(id))return Promise.resolve(PDF_PAGES.get(id));
+ if(PDF_BUSY.has(id))return PDF_BUSY.get(id);
+ const p=renderPdf(id).then(v=>{PDF_PAGES.set(id,v);PDF_BUSY.delete(id);attRender();ap();return v},e=>{PDF_BUSY.delete(id);PDF_ERR.set(id,e.message);ap();throw e});
+ PDF_BUSY.set(id,p);return p}
+FN.f=function(r){
+ const out=[];(photoReportFor(r).pdfs||[]).forEach(a=>{
+  const pg=PDF_PAGES.get(a.id);
+  if(pg)pg.forEach(src=>out.push(`<div class="pg fx pdf-pg"><img src="${src}" alt=""></div>`));
+  else if(PDF_ERR.has(a.id))out.push(`<div class="pg fx pdf-pg"><div class="pdf-wait">Không đọc được PDF “${esc(a.name)}”: ${esc(PDF_ERR.get(a.id))}</div></div>`);
+  else{out.push(`<div class="pg fx pdf-pg"><div class="pdf-wait">Đang tải PDF “${esc(a.name)}”…</div></div>`);loadPdf(a.id).catch(()=>{})}});
+ return out};
+function needIds(rows){
+ if(!document.querySelector('.ty[value="f"]:checked'))return[];
+ const ids=new Set();rows.forEach(i=>{const r=S.rows[i];r&&(photoReportFor(r).pdfs||[]).forEach(a=>{if(!PDF_PAGES.has(a.id)&&!PDF_ERR.has(a.id))ids.add(a.id)})});return[...ids]}
+function guardPrint(el,rows){el.addEventListener('click',async e=>{
+ if(el._go){el._go=0;return}
+ const ids=needIds(rows());if(!ids.length)return;
+ e.stopImmediatePropagation();e.preventDefault();
+ const st=$('pv-status');st.textContent=`Đang chuẩn bị ${ids.length} file PDF đính kèm…`;
+ try{await Promise.all(ids.map(loadPdf))}catch(er){st.textContent='Không tải được PDF đính kèm: '+er.message}
+ el._go=1;el.click()},true)}
+guardPrint($('pdf'),()=>sel());
+guardPrint($('photo-print-current'),()=>[Math.max(0,Number($('photo-row').value)||0)]);
+
+/* ---- Mục 6: gắn PDF vào biên bản ---- */
+function attRender(){
+ const s=$('att-row');if(!s)return;
+ if(!S.rows.length){s.innerHTML='<option value="">Chưa có biên bản</option>';$('att-list').innerHTML='';return}
+ s.innerHTML=S.rows.map((r,i)=>`<option value="${i}">STT ${i+1} · ${esc(r.ma||r.ten||'Biên bản')} · ${esc(r.hm||'')} · ${esc(r.vt||'')}</option>`).join('');
+ const i=Math.max(0,Math.min(Number(cur)||0,S.rows.length-1));s.value=String(i);
+ const L=photoReportFor(S.rows[i]).pdfs||[];
+ $('att-list').innerHTML=L.length?L.map((a,k)=>`<div class="att-it"><span>📄 ${esc(a.name)}${PDF_PAGES.has(a.id)?' · '+PDF_PAGES.get(a.id).length+' trang':''}${PDF_ERR.has(a.id)?' · <b style="color:#c00">lỗi: '+esc(PDF_ERR.get(a.id))+'</b>':''}</span><button type="button" class="s" data-att-del="${k}">Gỡ khỏi biên bản</button></div>`).join(''):'<div style="color:var(--mu)">Chưa có PDF nào gắn với biên bản này.</div>'}
+function attach(metas){
+ const row=S.rows[cur];if(!row||!metas.length)return;
+ const rep=photoReportFor(row);if(!Array.isArray(rep.pdfs))rep.pdfs=[];let n=0;
+ metas.forEach(m=>{if(!rep.pdfs.some(x=>x.id===m.id)){rep.pdfs.push({id:m.id,name:m.name});PDF_ERR.delete(m.id);n++}});
+ savePhotoReport(row);document.querySelector('.ty[value="f"]').checked=true;
+ $('att-status').textContent=`Đã gắn ${n} PDF vào biên bản STT ${cur+1}.`;
+ attRender();rep.pdfs.forEach(a=>loadPdf(a.id).catch(()=>{}));ap()}
+$('att-row').addEventListener('change',e=>{cur=Number(e.target.value)||0;photoEditorRender();ap()});
+$('att-drive').addEventListener('click',async()=>{attach(await pick({accept:'pdf',multi:true,title:'Chọn file PDF để chèn vào biên bản'}))});
+$('att-file').addEventListener('change',async e=>{
+ const fs=[...e.target.files];e.target.value='';if(!fs.length)return;
+ if(!TK){$('att-status').textContent='Hãy đăng nhập để lưu PDF vào Drive.';return}
+ const out=[];
+ for(const f of fs){try{$('att-status').textContent=`Đang tải lên “${f.name}”…`;out.push(await upload(f,DL.cur.id))}catch(er){$('att-status').textContent='Lỗi '+f.name+': '+er.message;break}}
+ attach(out)});
+$('att-list').addEventListener('click',e=>{
+ const b=e.target.closest('[data-att-del]');if(!b)return;const row=S.rows[cur];if(!row)return;
+ photoReportFor(row).pdfs.splice(Number(b.dataset.attDel),1);savePhotoReport(row);attRender();ap();$('att-status').textContent='Đã gỡ PDF khỏi biên bản (tệp vẫn còn trong thư viện).'});
+
+/* ---- Mục 4: chọn ảnh từ Drive / lưu bản sao lên Drive ---- */
+document.querySelectorAll('#photo-entry .photo-upload').forEach(box=>{
+ const i=box.querySelector('[data-photo-image]').dataset.photoImage;
+ box.querySelector('.photo-thumb').insertAdjacentHTML('beforebegin',`<button class="s" type="button" data-photo-drive="${i}" style="grid-column:1/-1">📁 Chọn ảnh từ thư viện Drive</button>`)});
+$('photo-status').insertAdjacentHTML('beforebegin','<label style="margin:6px 0;display:block"><input type="checkbox" id="photo-save-drive" style="width:auto"> Ảnh chọn từ máy: đồng thời lưu bản sao vào thư mục Drive <b class="dl-where">“Thư viện”</b> <small id="photo-drive-msg" style="color:var(--mu)"></small></label>');
+async function setPhoto(row,idx,file){
+ const rep=photoReportFor(row),prev=rep.images[idx];rep.images[idx]=await compressPhoto(file);
+ if(!savePhotoReport(row)){rep.images[idx]=prev;throw new Error(photoStoreError)}}
+$('photo-entry').addEventListener('click',async e=>{
+ const b=e.target.closest('[data-photo-drive]');if(!b)return;
+ const idx=Number(b.dataset.photoDrive),row=S.rows[cur],st=$('photo-status');
+ if(!row){st.textContent='Chưa chọn biên bản.';return}
+ const files=await pick({accept:'image',multi:true,title:`Chọn ảnh cho Ảnh ${idx+1} (chọn nhiều ảnh để điền luôn các ô còn trống)`});if(!files.length)return;
+ const rep=photoReportFor(row),slots=[idx].concat([0,1,2,3].filter(k=>k!==idx&&!rep.images[k]));let n=0;
+ for(let k=0;k<files.length&&k<slots.length;k++){
+  try{st.textContent=`Đang lấy ảnh “${files[k].name}” từ Drive…`;await setPhoto(row,slots[k],await getFile(files[k]));n++}
+  catch(er){st.textContent='Không thể chèn ảnh: '+er.message;break}}
+ if(n){document.querySelector('.ty[value="p"]').checked=true;photoEditorRender();ap();
+  st.textContent=`Đã chèn ${n} ảnh từ Drive vào biên bản STT ${S.rows.indexOf(row)+1}.`+(files.length>slots.length?` ${files.length-slots.length} ảnh chưa chèn vì hết ô trống.`:'')}});
+$('photo-entry').addEventListener('change',async e=>{
+ const i=e.target;if(!i.matches('[data-photo-image]')||!$('photo-save-drive').checked)return;
+ const f=i.files&&i.files[0];if(!f)return;const m=$('photo-drive-msg');
+ if(!TK){m.textContent='— chưa đăng nhập nên không lưu được lên Drive';return}
+ try{m.textContent='— đang lưu lên Drive…';await upload(f,DL.cur.id);m.textContent='— đã lưu bản sao lên Drive.';if(MB.id===DL.cur.id)MB.open(MB.id)}
+ catch(er){m.textContent='— lỗi lưu Drive: '+er.message}});
+
+/* ---- Mục 5: trình duyệt thư viện ---- */
+const MB=browser($('dl-host'),{});
+$('drive-lib').addEventListener('toggle',()=>{if($('drive-lib').open&&TK)MB.open(MB.id||DL.cur.id)});
+const mbT=setInterval(()=>{if(TK){clearInterval(mbT);MB.open('')}},800);
+
+const _per=photoEditorRender;photoEditorRender=function(){_per.apply(this,arguments);try{attRender()}catch(e){}};
+attRender();
+})();
+</script>
+</body></html>
