@@ -650,7 +650,7 @@ if(!t)for(let i=0;i<n;i++)o.add(i);else t.split(/[,;\s]+/).forEach(p=>{const m=p
 return[...o].sort((a,b)=>a-b)}
 ui();
 
-const CFG0={url:'https://script.google.com/macros/s/AKfycbyQlHnWuaS5MTCezYLbu-ID9ibPnK4gvWwq5Z9t2VNn4tloVsWQ56kglSUe_Jy3VxjT/exec'}; /* điền sẵn URL Web App ở đây nếu đưa trang lên web cho cả team */
+const CFG0={}; /* điền sẵn URL Web App ở đây nếu đưa trang lên web cho cả team */
 const OLD_CFG_URL='https://script.google.com/macros/s/AKfycbx13YZZxkbggnueggZf7EtUpNyInAvTWKjy6i2xlAujfolrawzLkA4Wetn-d3TvwpIr/exec';
 let CF={};try{CF=JSON.parse(localStorage.getItem('hsnt_cfg'))||{}}catch(e){}if(CF.url===OLD_CFG_URL)CF.url=CFG0.url;CF=Object.assign({},CFG0,CF);
 var TK='',UID='',UNAME='',REV=0,FORCE=false;
