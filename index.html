@@ -47,6 +47,8 @@ table.gr{border-collapse:collapse;min-width:2000px}
 #entry-table.compact .compact-group h3{margin:0 0 8px;font-size:13px}
 #entry-table.compact .compact-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
 #entry-table.compact .compact-field{min-width:0}
+.compact-fields.time3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.bad-date{border-color:#c0392b!important;background:#fdecea!important}
 #entry-table.compact .compact-field input,#entry-table.compact .compact-field select{min-width:0;min-height:34px;background:var(--pn)}
 #entry-table.compact .compact-field textarea{min-height:58px;background:var(--pn)}
 #entry-table.compact .compact-field.wide{grid-column:1/-1}
@@ -334,21 +336,21 @@ const T1="LẮP DỰNG KHUNG CỬA // DOOR/ WINDOW FRAME INSTALLATION",T2="LẮP
 function mgck(){if(String(S.ckv)!==CKV){S.ck1=C1;S.ck2=C2;S.ck3=C3;S.ck4=C4;S.t1=T1;S.t2=T2;S.t3=T3;S.t4=T4;S.ckv=CKV}}
 const CHECKLISTS=[['1','Khung phụ'],['2','Khung chính'],['3','Vách kính phòng tắm'],['4','Lan can']];
 const ckSelect=(value,attrs='')=>`<select ${attrs}>${CHECKLISTS.map(([v,n])=>`<option value="${v}" ${String(value||'1')===v?'selected':''}>${n}</option>`).join('')}</select>`;
-const COLS=[['ten','Tên công việc','Nghiệm thu lắp đặt'],['ma','Mã công tác','PO-4,5,6'],['hm','Hạng mục',''],['vt','Vị trí',''],['gui','Ngày gửi YCNT','d'],['ns','Thời gian NTNB bắt đầu','13h00'],['ne',' Thời gian NTNB kết thúc','14h00'],['nd','Ngày NTNB','d'],['ts','NTCV bắt đầu','14h00'],['te','NTCV kết thúc','15h00'],['td','Ngày NTCV','d'],['so','Số biên bản ',''],['bv','Bản vẽ tham chiếu','GMA.Q1.E&C-SDS-043-REV-01'],['tg','TVGS viên',''],['gs','Cán bộ KT hiện trường',''],['ck','Mẫu checklist','1'],['thap','Tháp',''],['tang','Tầng',''],['loai','Nghiệm thu gì',''],['ct','Đối tượng đã NT / tổng',''],['can','Căn hộ',''],['evid','Mã ghi sổ',''],['posted','Đã ghi lũy kế',''],['ghichu','Ghi chú nghiệm thu',''],['ctp','Đối tượng đã ghi lũy kế','']];
-const mig3=()=>{if(S.ck3==C3_OLD)S.ck3=C3;if(S.t3=='LAN CAN VÀ KÍNH PHÒNG TẮM // RAILING AND SHOWER GLASS INSTALLATION')S.t3='LẮP ĐẶT GƯƠNG VÀ VÁCH TẮM KÍNH // MIRROR & SHOWER SCREEN INSTALLATION'};
+const COLS=[['ten','Tên công việc','Nghiệm thu lắp đặt'],['ma','Mã công tác','PO-4,5,6'],['hm','Hạng mục',''],['vt','Vị trí',''],['gui','Ngày gửi YCNT','d'],['ns','Thời gian NT nội bộ bắt đầu','13h00'],['ne',' Thời gian NT nội bộ kết thúc','14h00'],['nd','Ngày NT nội bộ','d'],['ts','thời gian NTCV bắt đầu','14h00'],['te',' thời gian NTCV kết thúc','15h00'],['td','Ngày NTCV','d'],['so','Số biên bản ',''],['bv','Bản vẽ tham chiếu','GMA.Q1.E&C-SDS-043-REV-01'],['tg','TVGS viên',''],['gs','Cán bộ KT hiện trường',''],['ck','Mẫu checklist','1'],['thap','Tháp',''],['tang','Tầng',''],['loai','Nghiệm thu gì',''],['ct','Đối tượng đã NT / tổng',''],['can','Căn hộ',''],['evid','Mã ghi sổ',''],['posted','Đã ghi lũy kế',''],['ghichu','Ghi chú nghiệm thu',''],['ctp','Đối tượng đã ghi lũy kế','']];
+const mig3=()=>{if(S.ck3==C3_OLD)S.ck3=C3;if(S.t3=='LAN CAN VÀ KÍNH PHÒNG TẮM // RAILING AND SHOWER GLASS INSTALLATION')S.t3='LẮP ĐẶT GƯƠNG VÀ VÁCH TẮM KÍNH // '};
 let S;
 if(!S)S={g:{},rows:[],ck1:C1,ck2:C2,ck3:C3,ck4:C4,t4:T4,t1:T1,t2:T2,t3:T3,ckv:CKV,vl:VL};
 if(S.ck3==null)S.ck3=C3;if(S.t3==null)S.t3='VÁCH KÍNH PHÒNG TẮM // SHOWER SCREEN INSTALLATION';mig3();if(S.ck4==null)S.ck4=C4;if(S.t4==null)S.t4='SẢN XUẤT LẮP DỰNG LAN CAN // BALUSTRADE INSTALLATION & FABRICATION';
-if(S.t1=='LẮP DỰNG KHUNG CỬA // DOOR/WINDOW FRAME INSTALLATION')S.t1='LẮP DỰNG KHUNG PHỤ // SUBFRAME INSTALLATION';
-if(S.t2=='LẮP ĐẶT CỬA // DOOR/WINDOW INSTALLATION')S.t2='LẮP DỰNG KHUNG CHÍNH // MAINFRAME INSTALLATION';mgck();
+if(S.t1=='LẮP DỰNG KHUNG CỬA // DOOR/WINDOW FRAME INSTALLATION')S.t1='LẮP DỰNG KHUNG CỬA // DOOR/WINDOW FRAME INSTALLATION';
+if(S.t2=='LẮP ĐẶT CỬA // DOOR/WINDOW INSTALLATION')S.t2='LẮP DỰNG KHUNG CỬA // DOOR/WINDOW FRAME INSTALLATION';mgck();
 S.g=S.g||{};S.m=Object.assign({t:8,b:12,l:10,r:10,fit:1},S.m||{});S.hf=Object.assign({h:'',f:'',ha:'c',fa:'c'},S.hf||{});GF.forEach(f=>{if(S.g[f[0]]==null)S.g[f[0]]=f[2]});
-const $=i=>document.getElementById(i),ls=()=>{try{if(UID)localStorage.setItem('hsnt_d_'+UID,JSON.stringify({s:S,rev:REV,dirty:dirty}))}catch(e){}},sv=()=>{push();ls();ap();scheduleAutoSave()};
+const $=i=>document.getElementById(i),ls=()=>{try{if(UID)localStorage.setItem('hsnt_d_'+UID,JSON.stringify({s:S,rev:REV,dirty:dirty},(k,v)=>k==='photoReport'?undefined:v))}catch(e){}},sv=()=>{push();ls();ap();scheduleAutoSave()};
 const nr=()=>{const r={};COLS.forEach(c=>r[c[0]]=c[2]=='d'?'':c[2]);return r};
 const HID=['thap','tang','loai','ct','can','evid','posted','ghichu','ctp'],GRID=()=>COLS.filter(c=>HID.indexOf(c[0])<0);
 const RECORD_CLASSES=['Khung chính','Khung phụ','Lan can','Vách kính'];
 const ENTRY_GROUPS=[
 {title:'Thông tin biên bản',fields:['ten','ma','hm','vt','thap','tang','can','loai']},
-{title:'Thời gian nghiệm thu',fields:['gui','ns','ne','nd','ts','te','td']},
+{title:'Thời gian nghiệm thu',fields:['gui','nd','ns','ne','td','ts','te']},
 {title:'Hồ sơ và nội dung',fields:['so','bv','tg','gs','ck','ct','ghichu']}
 ];
 let compactEntry=true,editingRecord=null;
@@ -356,7 +358,12 @@ let nextRecordNumbers={};
 const TABLE_FILTERS={},QF_TABLE_FILTERS={};
 let selectedRecordClass='';
 let tableSort={key:'',direction:1};
-let filterDraft=null,photoStoreOwner='',photoStore={},photoStoreError='';
+let filterDraft=null,photoStoreOwner='',photoStore={},photoStoreError='';const photoDirty=new Set();
+/* Kho ảnh phiếu: IndexedDB (hàng trăm MB) thay cho localStorage (~5 MB, nên đầy sau vài ảnh) */
+const PH_DB={p:null,open(){return PH_DB.p||(PH_DB.p=new Promise((ok,bad)=>{if(!window.indexedDB)return bad(new Error('Trình duyệt không hỗ trợ IndexedDB'));const q=indexedDB.open('hsnt_photos',1);q.onupgradeneeded=()=>q.result.createObjectStore('r');q.onsuccess=()=>ok(q.result);q.onerror=()=>bad(q.error)}))},
+async all(owner){const db=await PH_DB.open();return new Promise((ok,bad)=>{const out={},c=db.transaction('r').objectStore('r').openCursor(IDBKeyRange.bound(owner+'|',owner+'|\uffff'));c.onsuccess=()=>{const cu=c.result;if(cu){out[String(cu.key).slice(owner.length+1)]=cu.value;cu.continue()}else ok(out)};c.onerror=()=>bad(c.error)})},
+async put(owner,key,val){const db=await PH_DB.open();return new Promise((ok,bad)=>{const tx=db.transaction('r','readwrite');tx.objectStore('r').put(val,owner+'|'+key);tx.oncomplete=()=>ok();tx.onerror=()=>bad(tx.error);tx.onabort=()=>bad(tx.error||new Error('Hết dung lượng lưu trữ của trình duyệt'))})}};
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 const filterNorm=value=>String(value||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
 function recordClass(row){
 const text=filterNorm([row.hm,row.loai,row.ten].join(' '));
@@ -444,7 +451,7 @@ const rows=filteredRows();
 $('tb').innerHTML=rows.slice(VA-1,VB).map(({row:r,index:i})=>{
 const main=compactEntry
 ?`<tr data-index="${i}"><td class="n">${i+1}</td><td class="compact-work"><span class="compact-main">${esc(r.ten||'—')}</span><small class="compact-sub">${esc([r.hm,r.ma].filter(Boolean).join(' · ')||recordClass(r))}</small></td><td class="compact-location"><span class="compact-main">${esc(compactPlace(r).main)}</span><small class="compact-sub">${esc(compactPlace(r).extra)}</small></td><td class="compact-date">${esc(F2(r.gui)||'—')}</td><td class="compact-internal"><span class="compact-main">${esc(F2(r.nd)||'Ngày chưa nhập')}</span><small class="compact-sub">${esc([r.ns,r.ne].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small></td><td class="compact-acceptance"><span class="compact-main">${esc(F2(r.td)||'Ngày chưa nhập')}</span><small class="compact-sub">${esc([r.ts,r.te].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small></td><td class="compact-actions"><button type="button" class="s" data-edit="${i}" aria-expanded="${editingRecord===i}">${editingRecord===i?'Đóng':'✎ Sửa'}</button> <button type="button" class="s" data-dup="${i}" aria-label="Nhân bản biên bản ${i+1}" title="Nhân bản">⧉</button> <button type="button" class="s" data-del="${i}" aria-label="Xóa biên bản ${i+1}" title="Xóa">×</button></td></tr>`
-:`<tr data-index="${i}"><td class="n">${i+1}</td><td class="n">${esc(recordClass(r))}</td>${GRID().map(c=>`<td>${c[0]=='ck'?ckSelect(r[c[0]],`data-r="${i}" data-k="${c[0]}"`):`<input data-r="${i}" data-k="${c[0]}" ${c[2]=='d'?'type="date"':''} value="${esc(r[c[0]])}">`}</td>`).join('')}<td class="n"><button class="s" data-dup="${i}">Nhân bản</button> <button class="s" data-del="${i}">Xóa</button></td></tr>`;
+:`<tr data-index="${i}"><td class="n">${i+1}</td><td class="n">${esc(recordClass(r))}</td>${GRID().map(c=>`<td>${c[0]=='ck'?ckSelect(r[c[0]],`data-r="${i}" data-k="${c[0]}"`):`<input data-r="${i}" data-k="${c[0]}" ${c[2]=='d'?'type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" data-d="1" autocomplete="off"':''} value="${esc(c[2]=='d'?F2(r[c[0]]):r[c[0]])}">`}</td>`).join('')}<td class="n"><button class="s" data-dup="${i}">Nhân bản</button> <button class="s" data-del="${i}">Xóa</button></td></tr>`;
 const editor=compactEntry&&editingRecord===i?renderCompactEditor(r,i,columns.length):'';
 return main+editor
 }).join('');
@@ -453,11 +460,11 @@ document.querySelectorAll('#th [data-filter-key]').forEach(button=>button.classL
 photoEditorRender();
 }
 function renderCompactEditor(row,index,columnCount){
-const fields=ENTRY_GROUPS.map(group=>`<section class="compact-group"><h3>${group.title}</h3><div class="compact-fields">${group.fields.map(key=>{
+const fields=ENTRY_GROUPS.map(group=>`<section class="compact-group"><h3>${group.title}</h3><div class="compact-fields${group.title==='Thời gian nghiệm thu'?' time3':''}">${group.fields.map(key=>{
 const column=COLS.find(item=>item[0]===key),wide=key==='ct'||key==='ghichu';
 const attrs=`data-r="${index}" data-k="${key}"`;
-const control=key==='ck'?ckSelect(row[key],attrs):wide?`<textarea ${attrs}>${esc(row[key]||'')}</textarea>${key==='ct'?`<div class="ct-upd"><button type="button" class="s" data-ctupd="${index}" title="Ghi chênh lệch số lượng vào lũy kế; lịch sử được lưu trong sheet luy_ke_lich_su">↻ Cập nhật lũy kế</button><small data-ctmsg="${index}">${row.posted=='1'?'Sửa số lượng rồi bấm để lũy kế thay đổi theo (có ghi lịch sử).':'Biên bản chưa gửi lũy kế — sửa xong cứ bấm Gửi.'}</small></div>`:''}`:`<input ${attrs} ${column[2]==='d'?'type="date"':''} value="${esc(row[key]||'')}">`;
-return `<div class="compact-field${wide?' wide':''}"><label>${column[1]}</label>${control}</div>`
+const isD=column[2]==='d',control=key==='ck'?ckSelect(row[key],attrs):wide?`<textarea ${attrs}>${esc(row[key]||'')}</textarea>${key==='ct'?`<div class="ct-upd"><button type="button" class="s" data-ctupd="${index}" title="Ghi chênh lệch số lượng vào lũy kế; lịch sử được lưu trong sheet luy_ke_lich_su">↻ Cập nhật lũy kế</button><small data-ctmsg="${index}">${row.posted=='1'?'Sửa số lượng rồi bấm để lũy kế thay đổi theo (có ghi lịch sử).':'Biên bản chưa gửi lũy kế — sửa xong cứ bấm Gửi.'}</small></div>`:''}`:`<input ${attrs} ${isD?'type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" data-d="1" autocomplete="off"':''} value="${esc(isD?F2(row[key]||''):(row[key]||''))}">`;
+return `<div class="compact-field${wide?' wide':''}"><label>${column[1].trim()}</label>${control}</div>${group.title==='Thời gian nghiệm thu'&&key==='gui'?'<div></div><div></div>':''}`
 }).join('')}</div></section>`).join('');
 return `<tr class="compact-edit-row" data-editor-for="${index}"><td colspan="${columnCount}"><div class="compact-edit-panel">${fields}<button type="button" class="s compact-close" data-edit="${index}" aria-expanded="true">Đóng phần sửa</button></div></td></tr>`
 }
@@ -484,11 +491,15 @@ used.add(row._photoKey)
 function loadPhotoStore(){
 const owner=UID||'local';
 if(photoStoreOwner===owner)return;
-photoStoreOwner=owner;photoStore={};
-photoStoreError='';
-try{photoStore=JSON.parse(localStorage.getItem('hsnt_photos_'+owner)||'{}')||{}}
-catch(error){photoStoreError='Không đọc được ảnh đã lưu trên thiết bị: '+error.message}
-}
+photoStoreOwner=owner;photoStore={};photoStoreError='';
+let legacy={};try{legacy=JSON.parse(localStorage.getItem('hsnt_photos_'+owner)||'{}')||{}}catch(error){}
+Object.assign(photoStore,legacy);
+PH_DB.all(owner).then(m=>{if(photoStoreOwner!==owner)return;
+Object.keys(m).forEach(k=>{if(!photoDirty.has(k))photoStore[k]=m[k]});
+const ks=Object.keys(legacy).filter(k=>!m[k]);
+if(Object.keys(legacy).length)Promise.all(ks.map(k=>PH_DB.put(owner,k,legacy[k]))).then(()=>{try{localStorage.removeItem('hsnt_photos_'+owner)}catch(e){}}).catch(()=>{});
+try{photoEditorRender()}catch(e){}
+}).catch(error=>{photoStoreError='Không đọc được ảnh đã lưu trên thiết bị: '+(error&&error.message||error)})}
 function photoReportFor(row){
 if(!row.photoReport||typeof row.photoReport!=='object')row.photoReport={images:['','','',''],attachment:'',comment:'',distribution:''};
 if(!Array.isArray(row.photoReport.images))row.photoReport.images=['','',''];
@@ -501,10 +512,12 @@ if(empty)return{images:['','','',''],attachment:'',comment:'',distribution:''};
 return{images:[0,1,2,3].map(index=>String(report&&report.images&&report.images[index]||'')),
 attachment:String(report&&report.attachment||''),comment:String(report&&report.comment||''),distribution:String(report&&report.distribution||'')}}
 function savePhotoReport(row){
-const status=$('photo-status');
-photoStore[row._photoKey]=photoReportFor(row);
-try{localStorage.setItem('hsnt_photos_'+(UID||'local'),JSON.stringify(photoStore));photoStoreError='';status.textContent='Ảnh và thông tin phiếu đã lưu trên trình duyệt này.';return true}
-catch(error){photoStoreError='Không lưu được ảnh trên thiết bị ('+error.message+'). Hãy giảm dung lượng ảnh hoặc gỡ ảnh cũ; dữ liệu Google Sheet không bị thay đổi.';status.textContent=photoStoreError;return false}}
+const status=$('photo-status'),owner=UID||'local',key=row._photoKey;
+photoStore[key]=photoReportFor(row);photoDirty.add(key);
+PH_DB.put(owner,key,photoStore[key]).then(()=>{photoDirty.delete(key);photoStoreError=''}).catch(error=>{
+try{const all=JSON.parse(localStorage.getItem('hsnt_photos_'+owner)||'{}');all[key]=photoStore[key];localStorage.setItem('hsnt_photos_'+owner,JSON.stringify(all));photoDirty.delete(key);photoStoreError='';return}catch(e2){}
+photoStoreError='Không lưu được ảnh trên thiết bị ('+(error&&error.message||error)+'). Hãy giải phóng dung lượng ổ đĩa hoặc gỡ ảnh cũ; dữ liệu Google Sheet không bị thay đổi.';status.textContent=photoStoreError});
+status.textContent='Ảnh và thông tin phiếu đã lưu trên trình duyệt này.';return true}
 function photoEditorRender(){
 const select=$('photo-row');if(!select)return;
 ensurePhotoKeys();loadPhotoStore();
@@ -588,8 +601,20 @@ const query=filterNorm(event.target.value);
 document.querySelectorAll('#excel-filter-menu .excel-filter-option').forEach(option=>{option.hidden=!filterNorm(option.textContent).includes(query)})
 });
 document.getElementById('reset-table-filters').onclick=()=>{Object.keys(TABLE_FILTERS).forEach(key=>delete TABLE_FILTERS[key]);Object.keys(QF_TABLE_FILTERS).forEach(key=>delete QF_TABLE_FILTERS[key]);selectedRecordClass='';tableSort={key:'',direction:1};qfApplyTableFilters();VA=1;ui()};
+/* Ô ngày nhập tay dd/mm/yyyy (chấp nhận 17/8/2026, 17-08-2026, 17.08.26, 17082026) – lưu nội bộ dạng yyyy-mm-dd */
+function parseVnDate(x){x=String(x||'').trim();if(!x)return'';
+let m=x.match(/^(\d{1,2})[\/.\-\s](\d{1,2})[\/.\-\s](\d{2}|\d{4})$/)||x.match(/^(\d{2})(\d{2})(\d{4}|\d{2})$/);
+if(!m){const i=x.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);if(i)m=[0,i[3],i[2],i[1]]}
+if(!m)return null;const d=+m[1],mo=+m[2],y=m[3].length==2?2000+(+m[3]):+m[3];
+if(y<1900||y>2100||mo<1||mo>12||d<1||d>new Date(y,mo,0).getDate())return null;
+return y+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0')}
+function dateVal(t){const v=parseVnDate(t.value);if(v===null)return S.rows[t.dataset.r][t.dataset.k]||'';t.classList.remove('bad-date');t.title='';return v}
+document.addEventListener('focusout',e=>{const t=e.target;if(!t||!t.matches||!t.matches('[data-d]'))return;
+const v=parseVnDate(t.value),row=S.rows[t.dataset.r];
+if(v===null){t.classList.add('bad-date');t.title='Nhập theo dạng dd/mm/yyyy, ví dụ 17/08/2026';return}
+t.classList.remove('bad-date');t.title='';t.value=v?F2(v):'';if(row&&row[t.dataset.k]!==v){row[t.dataset.k]=v;sv()}});
 document.addEventListener('input',e=>{const t=e.target;if(t.closest('#excel-filter-menu'))return;
-if(t.dataset.g)S.g[t.dataset.g]=t.value;else if(t.dataset.r!=null){S.rows[t.dataset.r][t.dataset.k]=t.value;const row=document.querySelector(`#tb tr[data-index="${t.dataset.r}"]`);if(row){if(compactEntry)updateCompactSummaryRow(Number(t.dataset.r));else row.cells[1].textContent=recordClass(S.rows[t.dataset.r]);row.hidden=!rowMatchesFilters(S.rows[t.dataset.r],Number(t.dataset.r))}renderRecordClasses();vr()}
+if(t.dataset.g)S.g[t.dataset.g]=t.value;else if(t.dataset.r!=null){S.rows[t.dataset.r][t.dataset.k]=t.dataset.d?dateVal(t):t.value;const row=document.querySelector(`#tb tr[data-index="${t.dataset.r}"]`);if(row){if(compactEntry)updateCompactSummaryRow(Number(t.dataset.r));else row.cells[1].textContent=recordClass(S.rows[t.dataset.r]);row.hidden=!rowMatchesFilters(S.rows[t.dataset.r],Number(t.dataset.r))}renderRecordClasses();vr()}
 else if(t.id=='vl')S.vl=t.value;else if(t.id=='ck1')S.ck1=t.value;else if(t.id=='ck2')S.ck2=t.value;else if(t.id=='ck3')S.ck3=t.value;else if(t.id=='ck4')S.ck4=t.value;else if(t.id=='ckt1')S.t1=t.value;else if(t.id=='ckt2')S.t2=t.value;else if(t.id=='ckt3')S.t3=t.value;else if(t.id=='ckt4')S.t4=t.value;sv()});
 document.getElementById('entry-layout-toggle').addEventListener('click',()=>{
 compactEntry=!compactEntry;
@@ -660,7 +685,7 @@ if(!t)for(let i=0;i<n;i++)o.add(i);else t.split(/[,;\s]+/).forEach(p=>{const m=p
 return[...o].sort((a,b)=>a-b)}
 ui();
 
-const CFG0={url:'https://script.google.com/macros/s/AKfycbzjbPf5mo20IFCfBvI0iO7aX7ax21KWFfY-GoHxf7Q0rc8bkW8zy_AQHUQ2QjVHHt6Q/exec'}; /* điền sẵn URL Web App ở đây nếu đưa trang lên web cho cả team */
+const CFG0={url:'https://script.google.com/macros/s/AKfycbyQlHnWuaS5MTCezYLbu-ID9ibPnK4gvWwq5Z9t2VNn4tloVsWQ56kglSUe_Jy3VxjT/exec'}; /* điền sẵn URL Web App ở đây nếu đưa trang lên web cho cả team */
 const OLD_CFG_URL='https://script.google.com/macros/s/AKfycbx13YZZxkbggnueggZf7EtUpNyInAvTWKjy6i2xlAujfolrawzLkA4Wetn-d3TvwpIr/exec';
 let CF={};try{CF=JSON.parse(localStorage.getItem('hsnt_cfg'))||{}}catch(e){}if(CF.url===OLD_CFG_URL)CF.url=CFG0.url;CF=Object.assign({},CFG0,CF);
 var TK='',UID='',UNAME='',REV=0,FORCE=false;
@@ -777,8 +802,8 @@ S.rows=d.slice(1).filter(v=>v.some(x=>String(x).trim())).map(v=>{const r={};COLS
 (res.chung||[]).slice(1).forEach(v=>{const k=String(v[0]||'').trim(),x=v[1]==null?'':String(v[1]);if(GF.some(f=>f[0]==k))S.g[k]=x;else if(['vl','ck1','ck2','ck3','ck4','t1','t2','t3','t4','ckv'].includes(k))S[k]=x;else if(k.indexOf('cat_')==0&&(k.slice(4) in CAT0)){cat();S.cat[k.slice(4)]=x}else if(k=='hf'){try{const o=JSON.parse(x);if(o&&typeof o=='object')S.hf=Object.assign({h:'',f:'',ha:'c',fa:'c'},o)}catch(_){}}else if(k=='mg'){const a=x.split(',').map(Number);if(a.length==5&&a.every(isFinite))S.m={t:a[0],b:a[1],l:a[2],r:a[3],fit:a[4]}}});
 dirty=false;try{const dr=JSON.parse(localStorage.getItem('hsnt_d_'+UID));if(dr&&dr.dirty&&String(dr.rev)==String(REV)&&confirm('Lần trước bạn có thay đổi chưa gửi về Google. Khôi phục bản nháp đó?')){S=dr.s;dirty=true}}catch(e){}
 if(S.ck3==null)S.ck3=C3;if(S.t3==null)S.t3='VÁCH KÍNH PHÒNG TẮM // SHOWER SCREEN INSTALLATION';mig3();if(S.ck4==null)S.ck4=C4;if(S.t4==null)S.t4='SẢN XUẤT LẮP DỰNG LAN CAN // BALUSTRADE INSTALLATION & FABRICATION';
-if(S.t1=='LẮP DỰNG KHUNG CỬA // DOOR/WINDOW FRAME INSTALLATION')S.t1='LẮP DỰNG KHUNG PHỤ // SUBFRAME INSTALLATION';
-if(S.t2=='LẮP ĐẶT CỬA // DOOR/WINDOW INSTALLATION')S.t2='LẮP DỰNG KHUNG CHÍNH // MAINFRAME INSTALLATION';mgck();
+if(S.t1=='LẮP DỰNG KHUNG CỬA // DOOR/WINDOW FRAME INSTALLATION')S.t1='LẮP DỰNG KHUNG CỬA // DOOR/WINDOW FRAME INSTALLATION';
+if(S.t2=='LẮP ĐẶT CỬA // DOOR/WINDOW INSTALLATION')S.t2='LẮP ĐẶT CỬA // DOOR/WINDOW INSTALLATION';mgck();
 VA=1;VB=Math.max(50,VB);am();mi();ui();qfInfoLoad();qfInit();build();ready=true;qfLK();lkStart();mark();$('who').textContent=UNAME+' ('+UID+')';
 stat(dirty?'● Đã khôi phục bản nháp chưa gửi – bấm “Gửi dữ liệu về Google”.':'Đã tải '+S.rows.length+' dòng dữ liệu của bạn lúc '+new Date().toLocaleTimeString('vi-VN'))}catch(e){stat('Lỗi đọc dữ liệu: '+e.message)}})
 .withFailureHandler(e=>{if(e&&e.code=='session')showLogin('Phiên đăng nhập hết hạn, hãy đăng nhập lại.');else stat('Không tải được dữ liệu: '+em(e))}).loadAll()}
@@ -824,9 +849,10 @@ const qfK=()=>$('qt').value.replace('Tháp ','');
 const qfF=()=>+($('qg').value.replace('Tầng ',''));
 const qfKD=()=>$('qt').value==KD_T;
 function qfOpt(id,arr){const e=$(id),v=e.value;e.innerHTML=arr.map(x=>`<option>${esc(x)}</option>`).join('');if(v&&arr.indexOf(v)>=0)e.value=v}
-const QF=[['ma','Mã hồ sơ'],['gui','Ngày gửi YCNT','date'],['ns','NTNB bắt đầu'],['ne','NTNB kết thúc'],['nd','Ngày NTNB','date'],['ts','NT bắt đầu'],['te','NT kết thúc'],['td','Ngày NT','date'],['so','Số biên bản (trống = STT)'],['bv','Bản vẽ tham chiếu'],['tg','TVGS viên'],['gs','Cán bộ KT hiện trường'],['ck','Mẫu checklist']];
+const QF=[['ma','Mã hồ sơ'],['gui','Ngày gửi YCNT','date'],['so','Số biên bản (trống = STT)'],['ck','Mẫu checklist'],['nd','Ngày NTNB','date'],['ns','NTNB bắt đầu'],['ne','NTNB kết thúc'],['bv','Bản vẽ tham chiếu'],['tg','TVGS viên'],['td','Ngày NT','date'],['ts','NT bắt đầu'],['te','NT kết thúc'],['gs','Cán bộ KT hiện trường']];
+const QF_DATE_ATTR='type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" data-d="1" autocomplete="off"';
 let QI={},qTenT=false;
-function qfInfoRender(){$('qinfo').innerHTML='<div><label>Tên công việc</label><input id="qten"></div>'+QF.map(f=>`<div><label>${f[1]}</label>${f[0]=='ck'?ckSelect(QI.ck,'data-qi="ck"'):`<input ${f[2]?'type="date"':''} data-qi="${f[0]}" value="${esc(QI[f[0]]||'')}">`}</div>`).join('');$('qten').value=qTenT?($('qten').dataset.v||''):''}
+function qfInfoRender(){$('qinfo').innerHTML='<div><label>Tên công việc</label><input id="qten"></div>'+QF.map(f=>`<div><label>${f[1]}</label>${f[0]=='ck'?ckSelect(QI.ck,'data-qi="ck"'):`<input ${f[2]?QF_DATE_ATTR:''} data-qi="${f[0]}" value="${esc(f[2]?F2(QI[f[0]]||''):(QI[f[0]]||''))}">`}</div>`).join('');$('qten').value=qTenT?($('qten').dataset.v||''):''}
 function qfInfoLoad(){const l=S.rows[S.rows.length-1],d=nr();QI={};QF.forEach(f=>QI[f[0]]=l?(f[0]=='so'?'':(l[f[0]]||'')):d[f[0]]);qTenT=false;qfInfoRender()}
 function qfAuto(){const th=$('qt').value,tg=$('qg').value,hm=$('qh').value,cn=qfCn();
 const ex=th==KD_T?'':($('qgx').value||'').trim();$('qauto').innerHTML='Tự điền vào bảng → Hạng mục: <b>'+esc(hm)+'</b> · Vị trí: <b>'+esc(th==KD_T?KD_T:tg+'-'+th+(cn?' - '+cn:''))+'</b>'+(ex?' · Gộp thêm tầng: <b>'+esc(ex)+'</b> (1 biên bản)':'')}
@@ -1257,7 +1283,7 @@ function qfMoveCell(input,rowDelta,colDelta){
 }
 $('qf').addEventListener('input',e=>{e.stopPropagation();const t=e.target;
 if(t.dataset.c){cat()[t.dataset.c]=t.value;sv();qfInit()}
-else if(t.dataset.qi){QI[t.dataset.qi]=t.value}
+else if(t.dataset.qi){if(t.dataset.d){const v=parseVnDate(t.value);if(v!==null)QI[t.dataset.qi]=v}else QI[t.dataset.qi]=t.value}
 else if(t.id=='qten'){qTenT=true;t.dataset.v=t.value}
 else if(t.matches('[data-qd],[data-qnote]')){qfClearGridSelection(t.closest('.qf-entry'));qfPaintAll()}});
 $('qk').addEventListener('keydown',event=>{
@@ -1331,7 +1357,7 @@ function qfRevRender(){const idx=[];S.rows.forEach((r,i)=>{if(r.ct&&r.thap)idx.p
 $('qvw').innerHTML='<label>Biên bản đã nhập ('+idx.length+') — bấm “Xem / Sửa” để xem chi tiết và chỉnh nếu sai</label>'+(idx.length?idx.slice(0,qfRevN).map(i=>{const r=S.rows[i];return `<div class="qr"><div style="flex:1;min-width:200px"><b>STT ${i+1}</b> · ${esc(r.vt)} · ${esc(r.hm)} · ${esc(r.loai)}<br><small>${esc(qfDisplayCt(r))} · Ngày NT ${esc(F2(r.td))} · ${r.posted=='1'?'✔ đã ghi lũy kế':'chưa gửi'}</small></div><button class="s" data-rvb="${i}">Xem / Sửa</button><div class="rvd" style="flex-basis:100%" hidden></div></div>`}).join('')+(idx.length>qfRevN?'<button class="s" id="qmore">Hiện thêm</button>':''):'<div><small>Chưa có biên bản nào.</small></div>')}
 function qfRevOpen(i,card){const r=S.rows[i],box=card.querySelector('.rvd'),ps=qfGroupedQty(r.ct,r.hm),notes=qfNotes(r),sc=[r.thap,r.tang,r.hm,r.loai].join('|');
 if(!box.hidden){box.hidden=true;return}
-box.innerHTML='<div class="g" style="margin:6px 0">'+[['ten','Tên công việc']].concat(QF).map(f=>`<div><label>${f[1]}</label>${f[0]=='ck'?ckSelect(r.ck,'data-ri="ck"'):`<input ${f[2]?'type="date"':''} data-ri="${f[0]}" value="${esc(r[f[0]]||'')}">`}</div>`).join('')+'</div><label>Chi tiết đối tượng trong biên bản tầng này — sửa số lượng nghiệm thu đợt này</label>'
+box.innerHTML='<div class="g" style="margin:6px 0">'+[['ten','Tên công việc']].concat(QF).map(f=>`<div><label>${f[1]}</label>${f[0]=='ck'?ckSelect(r.ck,'data-ri="ck"'):`<input ${f[2]?QF_DATE_ATTR:''} data-ri="${f[0]}" value="${esc(f[2]?F2(r[f[0]]||''):(r[f[0]]||''))}">`}</div>`).join('')+'</div><label>Chi tiết đối tượng trong biên bản tầng này — sửa số lượng nghiệm thu đợt này</label>'
 +ps.map((x,k)=>{const meta=qfItemMeta(x.n),floor=meta.floor||r.tang;return `<div class="qr"><label><span>${esc(x.n.replace(' :: ',': '))}<small data-rl="${k}">Tổng ${x.t===''?'—':x.t}</small></span></label><div class="qc"><i>Nghiệm thu đợt này</i><input type="number" inputmode="numeric" data-rq="${k}" value="${x.q}"></div><div class="qc"><i>Ghi chú</i><input type="text" data-rnote="${k}" value="${esc(notes[qfNoteKey(r.thap,floor,'',meta.name)]||'')}"></div>${x.t!==''?'<span>/ '+x.t+'</span>':''}</div>`}).join('')
 +'<div class="bar" style="margin:8px 0 0"><button data-rsave="'+i+'">Lưu chỉnh sửa</button><button class="s" data-rclose="'+i+'">Đóng</button></div>';
 box.hidden=false;
@@ -1339,13 +1365,13 @@ if(r.posted=='1'&&ready&&TK){const fs=[...new Set(ps.map(x=>qfItemMeta(x.n).floo
 async function qfRevSave(i,box){if(busy){qfMsg('Đang gửi dữ liệu, thử lại sau giây lát.');return}
 const r=S.rows[i],ps=qfGroupedQty(r.ct,r.hm),sc=[r.thap,r.tang,r.hm,r.loai].join('|'),ev=[],posted=r.posted=='1',
 nq=ps.map((x,k)=>{const v=box.querySelector('[data-rq="'+k+'"]').value;return v===''?x.q:+v});let err='';
-const iv=k=>box.querySelector('[data-ri="'+k+'"]').value;
+const iv=k=>{const e=box.querySelector('[data-ri="'+k+'"]');return e.dataset.d?(parseVnDate(e.value)||''):e.value};
 ps.forEach((x,k)=>{const d=nq[k]-x.q;if(!d||!posted)return;
 const meta=qfItemMeta(x.n),cum=lkCurrent(r.thap,meta.floor||r.tang,'',r.hm,r.loai,meta.name);
 if(cum!=null){const n=cum+d;if(n<0)err='"'+x.n+'": lũy kế hiện tại '+cum+', không thể giảm '+(-d)+'.';else if(x.t!==''&&n>x.t)err='"'+x.n+'": lũy kế sẽ thành '+n+' vượt tổng '+x.t+'.'}
 ev.push({id:(r.evid||'x')+'#'+k+'~'+Date.now().toString(36),thap:r.thap,tang:meta.floor||r.tang||'',can:'',hm:r.hm||'',loai:r.loai,ten:meta.name,sl:d,tong:x.t,ma:iv('ma'),vt:r.vt||'',ngnt:F2(iv('td')),note:box.querySelector('[data-rnote="'+k+'"]').value.trim()||'Điều chỉnh biên bản STT '+(i+1)})});
 if(err){qfMsg(err);return}
-const apply=()=>{box.querySelectorAll('[data-ri]').forEach(el=>{r[el.dataset.ri]=el.value});
+const apply=()=>{box.querySelectorAll('[data-ri]').forEach(el=>{r[el.dataset.ri]=el.dataset.d?(parseVnDate(el.value)||''):el.value});
 const updatedNotes={};ps.forEach((x,k)=>{const meta=qfItemMeta(x.n),note=box.querySelector('[data-rnote="'+k+'"]').value.trim();if(note)updatedNotes[qfNoteKey(r.thap,meta.floor||r.tang,'',meta.name)]=note});
 r.ct=ps.map((x,k)=>nq[k]?x.n+' '+nq[k]+(x.t!==''?'/'+x.t:''):'').filter(Boolean).join('; ');r.ghichu=JSON.stringify(updatedNotes);r.ctp=r.ct;sv();ui();qfRevRender();doPush()};
 if(!ev.length){apply();return}
