@@ -167,7 +167,7 @@ table.gr{border-collapse:collapse;min-width:2000px}
 .fx table.lgd{margin-top:-1px}.fx table.lgd td{font-size:.95em;padding:1mm 1.5mm}
 .fx table.sb td.pp{height:8mm;vertical-align:top}
 .fx table.sb tr.sgr td{height:12mm}.fx table.sb td.cm{height:10mm}.fx table.sb{margin-top:2mm}
-.pg.ck.fx{padding-top:min(var(--mt,8mm),8mm);padding-bottom:min(var(--mb,12mm),8mm)}
+.pg.ck.fx{padding-top:min(var(--mt,8mm),8mm);padding-bottom:min(var(--mb,12mm),8mm);padding-left:min(var(--ml,20mm),8mm);padding-right:min(var(--mr,12mm),8mm)}
 .fx table.cl td{padding:.5mm 1.2mm}.fx table.rw td{padding:.4mm 1.2mm}.fx table.rw tr.th td{padding:.6mm 1mm}
 .dl-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
 .dl-path{flex:1;min-width:180px;display:flex;flex-wrap:wrap;gap:2px;align-items:center}
@@ -652,7 +652,7 @@ function ckfit(){document.querySelectorAll('#pv .pg.ck').forEach(p=>{const t=p.q
 const cs=getComputedStyle(p),avail=p.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-18,rows=[...t.querySelectorAll('tr.rb')];
 const used=()=>tb[tb.length-1].getBoundingClientRect().bottom-tb[0].getBoundingClientRect().top;
 const st=(fs,rh)=>{p.style.setProperty('--ckf',fs+'pt');p.style.setProperty('--ckr',rh+'px');rows.forEach(r=>r.style.height='')};
-let fs=8,rh=28;st(fs,rh);while(used()>avail&&rh>6){rh-=2;st(fs,rh)}while(used()>avail&&fs>7.5){fs-=0.25;st(fs,rh)}
+let fs=11,rh=6;st(fs,rh);while(used()>avail&&fs>7){fs-=0.25;st(fs,rh)}
 const ex=avail-used();if(ex>2&&rows.length){const add=ex/rows.length;rows.forEach(r=>{r.style.height=(r.getBoundingClientRect().height+add)+'px'})}})}
 function pict(r,i){
 const report=photoReportFor(r),images=report.images.map((src,index)=>`<figure class="photo-item">${src?`<img src="${esc(src)}" alt="Ảnh nghiệm thu ${index+1}">`:`<div class="photo-placeholder">CHƯA CHÈN ẢNH ${index+1}</div>`}<figcaption>HÌNH ẢNH NGHIỆM THU CÔNG VIỆC</figcaption></figure>`).join('');
