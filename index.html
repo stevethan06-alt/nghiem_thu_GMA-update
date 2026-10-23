@@ -41,6 +41,8 @@ table.gr{border-collapse:collapse;min-width:2000px}
 #entry-table.compact .compact-date{white-space:nowrap}
 #entry-table.compact .compact-actions{white-space:nowrap;text-align:center}
 #entry-table.compact .compact-actions button{padding:4px 8px}
+.upd-msg{display:block;font-size:11px;color:var(--mu);white-space:normal;max-width:200px}
+.bad-date{color:#b00020;font-weight:700}
 #entry-table.compact .compact-edit-row>td{padding:10px;background:var(--bg)}
 #entry-table.compact .compact-edit-panel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 #entry-table.compact .compact-group{min-width:0;padding:10px;background:var(--pn);border:1px solid var(--bd);border-radius:7px}
@@ -369,14 +371,23 @@ if(text.includes('vach kinh'))return'Vách kính';
 if(text.includes('khung phu')||text.includes('grouting khung phu')||text.includes('subframe'))return'Khung phụ';
 if(text.includes('khung chinh')||text.includes('mainframe'))return'Khung chính';
 return'Khác'}
-function nextRecordNumberForClass(category){
-let max=null,hasRows=false;
+function nextRecordNumberForClass(category,skipFrom,skipTo){
+let max=null;
 S.rows.forEach((row,index)=>{
 if(recordClass(row)!==category)return;
-hasRows=true;
-const value=String(row.so||'').trim(),number=value?(/^\d+$/.test(value)?Number(value):NaN):index+1;
+const value=String(row.so||'').trim();
+if(!value&&skipFrom!=null&&index>=skipFrom&&index<skipTo)return;
+const number=value?(/^\d+$/.test(value)?Number(value):NaN):index+1;
 if(Number.isSafeInteger(number)&&number>=0)max=max===null?number:Math.max(max,number)});
-return hasRows?(max===null?undefined:max+1):nextRecordNumbers[category]}
+const local=max===null?undefined:max+1,srv=nextRecordNumbers[category],server=Number.isInteger(srv)?srv:undefined;
+if(local===undefined)return server;if(server===undefined)return local;
+return Math.max(local,server)}
+/* số biên bản dùng chung: lấy số lớn nhất của TOÀN BỘ dữ liệu (mọi người dùng + dòng đang nhập), mỗi biên bản mới nhận 1 số riêng */
+function numberNewRows(from,to){
+if(to==null)to=S.rows.length;
+for(let i=from;i<to;i++){const r=S.rows[i];if(!r||String(r.so||'').trim())continue;
+const c=recordClass(r);if(c==='Khác')continue;
+const n=nextRecordNumberForClass(c,from,to);if(Number.isInteger(n))r.so=String(n)}}
 function tableColumnValue(row,index,key){
 if(key==='__class')return recordClass(row);
 if(key==='__stt')return String(index+1);
@@ -447,8 +458,8 @@ $('th').innerHTML='<tr>'+columns.map(([key,title])=>`<th><div class="filter-head
 const rows=filteredRows();
 $('tb').innerHTML=rows.slice(VA-1,VB).map(({row:r,index:i})=>{
 const main=compactEntry
-?`<tr data-index="${i}"><td class="n">${i+1}</td><td class="compact-work"><span class="compact-main">${esc(r.ten||'—')}</span><small class="compact-sub">${esc([r.hm,r.ma].filter(Boolean).join(' · ')||recordClass(r))}</small></td><td class="compact-location"><span class="compact-main">${esc(compactPlace(r).main)}</span><small class="compact-sub">${esc(compactPlace(r).extra)}</small></td><td class="compact-date">${esc(F2(r.gui)||'—')}</td><td class="compact-internal"><span class="compact-main">${esc(F2(r.nd)||'Ngày chưa nhập')}</span><small class="compact-sub">${esc([r.ns,r.ne].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small></td><td class="compact-acceptance"><span class="compact-main">${esc(F2(r.td)||'Ngày chưa nhập')}</span><small class="compact-sub">${esc([r.ts,r.te].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small></td><td class="compact-actions"><button type="button" class="s" data-edit="${i}" aria-expanded="${editingRecord===i}">${editingRecord===i?'Đóng':'✎ Sửa'}</button> <button type="button" class="s" data-dup="${i}" aria-label="Nhân bản biên bản ${i+1}" title="Nhân bản">⧉</button> <button type="button" class="s" data-del="${i}" aria-label="Xóa biên bản ${i+1}" title="Xóa">×</button></td></tr>`
-:`<tr data-index="${i}"><td class="n">${i+1}</td><td class="n">${esc(recordClass(r))}</td>${GRID().map(c=>`<td>${c[0]=='ck'?ckSelect(r[c[0]],`data-r="${i}" data-k="${c[0]}"`):`<input data-r="${i}" data-k="${c[0]}" ${c[2]=='d'?'type="text" placeholder="dd/mm/yyyy"':''} value="${esc(c[2]=='d'?F2(r[c[0]]):r[c[0]])}">`}</td>`).join('')}<td class="n"><button class="s" data-dup="${i}">Nhân bản</button> <button class="s" data-del="${i}">Xóa</button></td></tr>`;
+?`<tr data-index="${i}"><td class="n">${i+1}</td><td class="compact-work"><span class="compact-main">${esc(r.ten||'—')}</span><small class="compact-sub">${esc([r.hm,r.ma].filter(Boolean).join(' · ')||recordClass(r))}</small></td><td class="compact-location"><span class="compact-main">${esc(compactPlace(r).main)}</span><small class="compact-sub">${esc(compactPlace(r).extra)}</small></td><td class="compact-date">${dHtml(r.gui,'—')}</td><td class="compact-internal"><span class="compact-main">${dHtml(r.nd,'Ngày chưa nhập')}</span><small class="compact-sub">${esc([r.ns,r.ne].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small></td><td class="compact-acceptance"><span class="compact-main">${dHtml(r.td,'Ngày chưa nhập')}</span><small class="compact-sub">${esc([r.ts,r.te].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small></td><td class="compact-actions"><button type="button" class="s" data-edit="${i}" aria-expanded="${editingRecord===i}">${editingRecord===i?'Đóng':'✎ Sửa'}</button> <button type="button" class="s" data-upd="${i}" title="Lưu biên bản này lên Google ngay">⟳ Cập nhật</button> <button type="button" class="s" data-dup="${i}" aria-label="Nhân bản biên bản ${i+1}" title="Nhân bản">⧉</button> <button type="button" class="s" data-del="${i}" aria-label="Xóa biên bản ${i+1}" title="Xóa">×</button><small class="upd-msg" data-updmsg="${i}"></small></td></tr>`
+:`<tr data-index="${i}"><td class="n">${i+1}</td><td class="n">${esc(recordClass(r))}</td>${GRID().map(c=>`<td>${c[0]=='ck'?ckSelect(r[c[0]],`data-r="${i}" data-k="${c[0]}"`):`<input data-r="${i}" data-k="${c[0]}" ${c[2]=='d'?'type="text" placeholder="dd/mm/yyyy"':''} value="${esc(c[2]=='d'?F2(r[c[0]]):r[c[0]])}">`}</td>`).join('')}<td class="n"><button class="s" data-upd="${i}">⟳ Cập nhật</button> <button class="s" data-dup="${i}">Nhân bản</button> <button class="s" data-del="${i}">Xóa</button><small class="upd-msg" data-updmsg="${i}"></small></td></tr>`;
 const editor=compactEntry&&editingRecord===i?renderCompactEditor(r,i,columns.length):'';
 return main+editor
 }).join('');
@@ -463,7 +474,7 @@ const attrs=`data-r="${index}" data-k="${key}"`;
 const control=key==='ck'?ckSelect(row[key],attrs):wide?`<textarea ${attrs}>${esc(row[key]||'')}</textarea>${key==='ct'?`<div class="ct-upd"><button type="button" class="s" data-ctupd="${index}" title="Ghi chênh lệch số lượng vào lũy kế; lịch sử được lưu trong sheet luy_ke_lich_su">↻ Cập nhật lũy kế</button><small data-ctmsg="${index}">${row.posted=='1'?'Sửa số lượng rồi bấm để lũy kế thay đổi theo (có ghi lịch sử).':'Biên bản chưa gửi lũy kế — sửa xong cứ bấm Gửi.'}</small></div>`:''}`:`<input ${attrs} ${column[2]==='d'?'type="text" placeholder="dd/mm/yyyy"':''} value="${esc(column[2]==='d'?F2(row[key]):(row[key]||''))}">`;
 return `<div class="compact-field${wide?' wide':''}"><label>${column[1]}</label>${control}</div>`
 }).join('')}</div></section>`).join('');
-return `<tr class="compact-edit-row" data-editor-for="${index}"><td colspan="${columnCount}"><div class="compact-edit-panel">${fields}<button type="button" class="s compact-close" data-edit="${index}" aria-expanded="true">Đóng phần sửa</button></div></td></tr>`
+return `<tr class="compact-edit-row" data-editor-for="${index}"><td colspan="${columnCount}"><div class="compact-edit-panel">${fields}<button type="button" class="s" data-upd="${index}" title="Lưu biên bản này lên Google ngay">⟳ Cập nhật lên Google</button> <small class="upd-msg" data-updmsg="${index}"></small> <button type="button" class="s compact-close" data-edit="${index}" aria-expanded="true">Đóng phần sửa</button></div></td></tr>`
 }
 function updateCompactSummaryRow(index){
 if(!compactEntry)return;
@@ -471,9 +482,9 @@ const row=S.rows[index],element=document.querySelector(`#tb tr[data-index="${ind
 if(!row||!element)return;
 element.querySelector('.compact-work').innerHTML=`<span class="compact-main">${esc(row.ten||'—')}</span><small class="compact-sub">${esc([row.hm,row.ma].filter(Boolean).join(' · ')||recordClass(row))}</small>`;
 element.querySelector('.compact-location').innerHTML=`<span class="compact-main">${esc(compactPlace(row).main)}</span><small class="compact-sub">${esc(compactPlace(row).extra)}</small>`;
-element.querySelector('.compact-date').textContent=F2(row.gui)||'—';
-element.querySelector('.compact-internal').innerHTML=`<span class="compact-main">${esc(F2(row.nd)||'Ngày chưa nhập')}</span><small class="compact-sub">${esc([row.ns,row.ne].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small>`;
-element.querySelector('.compact-acceptance').innerHTML=`<span class="compact-main">${esc(F2(row.td)||'Ngày chưa nhập')}</span><small class="compact-sub">${esc([row.ts,row.te].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small>`;
+element.querySelector('.compact-date').innerHTML=dHtml(row.gui,'—');
+element.querySelector('.compact-internal').innerHTML=`<span class="compact-main">${dHtml(row.nd,'Ngày chưa nhập')}</span><small class="compact-sub">${esc([row.ns,row.ne].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small>`;
+element.querySelector('.compact-acceptance').innerHTML=`<span class="compact-main">${dHtml(row.td,'Ngày chưa nhập')}</span><small class="compact-sub">${esc([row.ts,row.te].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small>`;
 }
 const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 function photoSignature(row){return JSON.stringify([row.ma,row.so,row.gui,row.td,row.vt,row.hm,row.loai,row.ten].map(value=>String(value||'').trim()))}
@@ -603,11 +614,11 @@ ui()
 document.addEventListener('click',e=>{const t=e.target.closest('[data-edit]')||e.target;
 if(t.dataset.edit!=null){const index=Number(t.dataset.edit);editingRecord=editingRecord===index?null:index;ui();return}
 if(t.dataset.del!=null){const idx=Number(t.dataset.del);if(!confirm('Xóa dòng '+(idx+1)+'? Thay đổi sẽ được đồng bộ lên Google Sheet.'))return;S.rows.splice(idx,1);if(editingRecord===idx)editingRecord=null;else if(editingRecord>idx)editingRecord--;sv();ui()}
-if(t.dataset.dup!=null){const idx=Number(t.dataset.dup),original=S.rows[idx],copy={...original,photoReport:clonePhotoReport(photoReportFor(original),false)};delete copy._photoKey;S.rows.splice(idx+1,0,copy);if(editingRecord>idx)editingRecord++;sv();ui()}});
-$('add').onclick=()=>{const l=S.rows[S.rows.length-1],row=l?{...l,so:'',photoReport:clonePhotoReport(null,true)}:nr();delete row._photoKey;S.rows.push(row);cur=S.rows.length-1;if(S.rows.length>VB){const w=VB-VA;VB=S.rows.length;VA=Math.max(1,VB-w)}sv();ui()};
+if(t.dataset.dup!=null){const idx=Number(t.dataset.dup),original=S.rows[idx],copy={...original,photoReport:clonePhotoReport(photoReportFor(original),false)};delete copy._photoKey;copy.so='';S.rows.splice(idx+1,0,copy);numberNewRows(idx+1,idx+2);if(editingRecord>idx)editingRecord++;sv();ui()}});
+$('add').onclick=()=>{const l=S.rows[S.rows.length-1],row=l?{...l,so:'',photoReport:clonePhotoReport(null,true)}:nr();delete row._photoKey;S.rows.push(row);numberNewRows(S.rows.length-1);cur=S.rows.length-1;if(S.rows.length>VB){const w=VB-VA;VB=S.rows.length;VA=Math.max(1,VB-w)}sv();ui()};
 $('clr').onclick=()=>{if(confirm('Xóa toàn bộ dòng dữ liệu trên giao diện và đồng bộ danh sách mới lên Google Sheet?')){S.rows=[];sv();ui()}};
 $('paste').onclick=()=>{const t=prompt('Dán các dòng copy từ Excel (đúng thứ tự cột như bảng, ngày dạng dd/mm/yyyy):');if(!t)return;
-t.split(/\r?\n/).filter(x=>x.trim()).forEach(l=>{const v=l.split('\t'),r=nr();COLS.forEach((c,i)=>{let x=(v[i]||'').trim();if(c[2]=='d'){const m=x.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);x=m?`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`:x}r[c[0]]=x||r[c[0]]});S.rows.push(r)});sv();ui()};
+const from0=S.rows.length;t.split(/\r?\n/).filter(x=>x.trim()).forEach(l=>{const v=l.split('\t'),r=nr();COLS.forEach((c,i)=>{let x=(v[i]||'').trim();if(c[2]=='d'){const m=x.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);x=m?`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`:x}r[c[0]]=x||r[c[0]]});S.rows.push(r)});numberNewRows(from0);sv();ui()};
 /* ---- sinh biên bản ---- */
 const G=()=>S.g,F=d=>d?(dparts(d)?dparts(d).reverse().join('/'):String(d)):'…/…/…',P=d=>d?(dparts(d)||['…','…','…']):['…','…','…'];
 const nl=s=>esc(s).replace(/\n/g,'<br>'),dots='……………………………………';
@@ -693,6 +704,9 @@ const em=e=>e&&EM[e.code]?EM[e.code]:(e&&e.message==='Failed to fetch'?'không k
 var GAS=null,ready=false,busy=false,dirty=false,pushT=0,apT=0,cur=0,VA=1,VB=50;
 const stat=t=>{$('sync').textContent=t};
 const nz=x=>String(x||'').trim().toLowerCase(),F2=d=>d?(dparts(d)?dparts(d).reverse().join('/'):String(d)):'';
+const dateBad=d=>{if(!d)return false;const p=dparts(d);if(!p)return true;const y=+p[0],m=+p[1],dd=+p[2];return m<1||m>12||dd<1||dd>31||y<2015||y>2100};
+const dHtml=(v,empty)=>{const t=F2(v);if(!t)return esc(empty);return dateBad(v)?`<span class="bad-date" title="Ngày không hợp lệ — hãy nhập lại">⚠ ${esc(t)}</span>`:esc(t)};
+const badDateNote=()=>{const n=S.rows.filter(r=>['gui','nd','td'].some(k=>dateBad(r[k]))).length;return n?' · ⚠ '+n+' biên bản có ngày không hợp lệ (chữ đỏ) — hãy nhập lại':''};
 const iso=x=>{x=(x||'').trim();let m=x.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;m=x.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/);return m?`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`:x};
 /* xem trước tự động: mặc định chỉ dựng dòng đang nhập (tối đa 12 trang); xuất PDF dựng đủ */
 function build(full){const ty=[...document.querySelectorAll('.ty:checked')].map(x=>x.value),st=$('pv-status'),blank=!$('rng').value.trim();
@@ -748,15 +762,35 @@ async function autoSaveToGoogle(){
     applyNextRecordNumbers(saved.nextRecordNumbers);
     if(seq===changeSeq){
       dirty=false;mark();ls();
-      stat('✔ Đã tự động đồng bộ dữ liệu hồ sơ lên Google Sheet lúc '+new Date().toLocaleTimeString('vi-VN')+'.');
+      stat('✔ Đã tự động đồng bộ dữ liệu hồ sơ lên Google Sheet lúc '+new Date().toLocaleTimeString('vi-VN')+'.'+(saved.warn?' ⚠ Lỗi ghi sheet chi_tiet: '+saved.warn:''));
     }else{
       ls();scheduleAutoSave();
     }
   }catch(e){
-    stat('⚠ Chưa đồng bộ được lên Google: '+em(e)+'. Dữ liệu vẫn còn trên giao diện; sẽ thử lại.');
-    autoSaveTimer=setTimeout(autoSaveToGoogle,2500);
+    if(e&&e.code=='conflict'){stat('⚠ CHƯA LƯU: dữ liệu trên Google vừa được sửa ở máy/tab khác. Bấm “Ghi đè bằng bản của tôi” (giữ dữ liệu đang hiển thị) hoặc “Tải lại từ Google”.');$('cf').style.display='';ls()}
+    else if(e&&e.code=='session'){showLogin('Phiên đăng nhập hết hạn, hãy đăng nhập lại (dữ liệu chưa lưu vẫn được giữ trên máy).')}
+    else{stat('⚠ Chưa đồng bộ được lên Google: '+em(e)+'. Dữ liệu vẫn còn trên giao diện; sẽ thử lại.');autoSaveTimer=setTimeout(autoSaveToGoogle,2500)}
   }finally{autoSaving=false}
 }
+async function updateRecord(i){
+const els=()=>[...document.querySelectorAll('[data-updmsg="'+i+'"]')],say=t=>els().forEach(el=>{el.textContent=t});
+if(!GAS||!ready||!TK){say('Chưa đăng nhập hoặc chưa tải xong dữ liệu.');return}
+if(busy||autoSaving){say('Đang đồng bộ, thử lại sau giây lát.');return}
+clearTimeout(autoSaveTimer);autoSaving=true;say('Đang lưu lên Google…');const seq=changeSeq;
+try{let saved;
+try{saved=await call('save',payload())}
+catch(e){if(e&&e.code=='conflict'&&confirm('Dữ liệu trên Google vừa được sửa ở máy/tab khác.\nGhi đè bằng dữ liệu đang hiển thị?')){FORCE=true;try{saved=await call('save',payload())}finally{FORCE=false}}else throw e}
+applyNextRecordNumbers(saved.nextRecordNumbers);$('cf').style.display='none';
+if(seq===changeSeq){dirty=false;mark();ls()}else{scheduleAutoSave()}
+const tm=new Date().toLocaleTimeString('vi-VN');
+say('✔ Đã lưu lúc '+tm+(saved.unchanged?' (không có thay đổi mới)':'')+(saved.warn?' · ⚠ lỗi sheet chi_tiet: '+saved.warn:''));
+stat('✔ Đã cập nhật biên bản STT '+(i+1)+' lên Google lúc '+tm+'.')}
+catch(e){if(e&&e.code=='session'){showLogin('Phiên đăng nhập hết hạn, hãy đăng nhập lại (dữ liệu chưa lưu vẫn được giữ trên máy).');return}
+say('⚠ Chưa lưu được: '+em(e)+' — dữ liệu vẫn còn trên màn hình, bấm lại để thử.')}
+finally{autoSaving=false}}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-upd]');if(b){e.preventDefault();updateRecord(+b.dataset.upd)}});
+async function refreshRecordNumbers(){if(!GAS||!ready||!TK||busy||autoSaving)return;try{const j=await call('record_numbers');applyNextRecordNumbers(j.nextRecordNumbers)}catch(e){}}
+setInterval(refreshRecordNumbers,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshRecordNumbers()});
 function doPush(){if(busy)return;if(!GAS||!ready){stat('Chưa đăng nhập hoặc chưa tải xong dữ liệu.');return}busy=true;stat('Đang ghi lũy kế và gửi lên Google Sheet…');
 const evs=evList(),rows=S.rows.filter(r=>r.ct&&r.thap&&r.loai&&r.posted!='1');let lkNote='';
 const save=()=>GAS.withSuccessHandler(()=>{busy=false;FORCE=false;dirty=false;mark();ls();$('cf').style.display='none';qfLK();stat('Đã gửi dữ liệu về Google lúc '+new Date().toLocaleTimeString('vi-VN')+lkNote);qfMsg('✔ Xong biên bản — đã gửi Google lúc '+new Date().toLocaleTimeString('vi-VN')+lkNote);if(document.querySelector('.app').classList.contains('quick-layout-mode'))$('qquick-message').textContent='✔ Đã lưu '+rows.length+' biên bản lên Google.'+lkNote}).withFailureHandler(e=>{busy=false;
@@ -779,12 +813,12 @@ GAS.withSuccessHandler(res=>{try{UNAME=res.name||UID;applyNextRecordNumbers(res.
 const ix=COLS.map((c,i)=>{let k=h.indexOf(nz(c[1]));if(k<0)k=h.indexOf(c[0]);return k<0?i:k});
 S.rows=d.slice(1).filter(v=>v.some(x=>String(x).trim())).map(v=>{const r={};COLS.forEach((c,i)=>{const x=String(v[ix[i]]==null?'':v[ix[i]]).trim();r[c[0]]=c[2]=='d'?iso(x):x});if(r.posted=='1'&&!r.ctp)r.ctp=r.ct;return r});
 (res.chung||[]).slice(1).forEach(v=>{const k=String(v[0]||'').trim(),x=v[1]==null?'':String(v[1]);if(GF.some(f=>f[0]==k))S.g[k]=x;else if(['vl','ck1','ck2','ck3','ck4','t1','t2','t3','t4','ckv'].includes(k))S[k]=x;else if(k.indexOf('cat_')==0&&(k.slice(4) in CAT0)){cat();S.cat[k.slice(4)]=x}else if(k=='hf'){try{const o=JSON.parse(x);if(o&&typeof o=='object')S.hf=Object.assign({h:'',f:'',ha:'c',fa:'c'},o)}catch(_){}}else if(k=='mg'){const a=x.split(',').map(Number);if(a.length==5&&a.every(isFinite))S.m={t:a[0],b:a[1],l:a[2],r:a[3],fit:a[4]}}});
-dirty=false;try{const dr=JSON.parse(localStorage.getItem('hsnt_d_'+UID));if(dr&&dr.dirty&&String(dr.rev)==String(REV)&&confirm('Lần trước bạn có thay đổi chưa gửi về Google. Khôi phục bản nháp đó?')){S=dr.s;dirty=true}}catch(e){}
+dirty=false;try{const dr=JSON.parse(localStorage.getItem('hsnt_d_'+UID));if(dr&&dr.dirty&&confirm('Lần trước bạn có thay đổi CHƯA lưu được lên Google (còn giữ trên máy này). Khôi phục bản nháp đó? (Nếu đã sửa ở máy khác thì bản nháp có thể cũ hơn.)')){S=dr.s;dirty=true}}catch(e){}
 if(S.ck3==null)S.ck3=C3;if(S.t3==null)S.t3='VÁCH KÍNH PHÒNG TẮM // SHOWER SCREEN INSTALLATION';mig3();if(S.ck4==null)S.ck4=C4;if(S.t4==null)S.t4='SẢN XUẤT LẮP DỰNG LAN CAN // BALUSTRADE INSTALLATION & FABRICATION';
 if(['LẮP DỰNG KHUNG PHỤ // SUBFRAME INSTALLATION','LẮP DỰNG KHUNG CỬA // DOOR/WINDOW FRAME INSTALLATION'].includes(S.t1))S.t1=T1;
 if(['LẮP DỰNG KHUNG CHÍNH // MAINFRAME INSTALLATION','LẮP ĐẶT CỬA // DOOR/WINDOW INSTALLATION'].includes(S.t2))S.t2=T2;mgck();
 VA=1;VB=Math.max(50,VB);am();mi();ui();qfInfoLoad();qfInit();build();ready=true;qfLK();lkStart();mark();$('who').textContent=UNAME+' ('+UID+')';
-stat(dirty?'● Đã khôi phục bản nháp chưa gửi – bấm “Gửi dữ liệu về Google”.':'Đã tải '+S.rows.length+' dòng dữ liệu của bạn lúc '+new Date().toLocaleTimeString('vi-VN'))}catch(e){stat('Lỗi đọc dữ liệu: '+e.message)}})
+stat(dirty?'● Đã khôi phục bản nháp chưa gửi – bấm “Gửi dữ liệu về Google”.':'Đã tải '+S.rows.length+' dòng dữ liệu của bạn lúc '+new Date().toLocaleTimeString('vi-VN')+badDateNote())}catch(e){stat('Lỗi đọc dữ liệu: '+e.message)}})
 .withFailureHandler(e=>{if(e&&e.code=='session')showLogin('Phiên đăng nhập hết hạn, hãy đăng nhập lại.');else stat('Không tải được dữ liệu: '+em(e))}).loadAll()}
 /* đăng nhập */
 function showLogin(msg){ready=false;TK='';lkStop();try{localStorage.removeItem('hsnt_tk')}catch(e){}$('lg').style.display='block';$('lm').textContent=msg||'';
@@ -1210,7 +1244,7 @@ qQuickGroups.forEach((group,groupIndex)=>{
 });
 if(error){$('qquick-message').textContent=error;return}
 if(!newRows.length){$('qquick-message').textContent='Tích ít nhất một đối tượng nghiệm thu.';return}
-S.rows.push(...newRows);const count=S.rows.length;if(count>VB){const width=VB-VA;VB=count;VA=Math.max(1,VB-width)}cur=count-1;
+const from1=S.rows.length;S.rows.push(...newRows);numberNewRows(from1);const count=S.rows.length;if(count>VB){const width=VB-VA;VB=count;VA=Math.max(1,VB-width)}cur=count-1;
  $('qquick-submit').disabled=true;$('qquick-message').textContent=`Đã thêm ${newRows.length} biên bản vào danh sách. Đang gửi dữ liệu và ghi lũy kế…`;
 sv();ui();qfItems();doPush()
 }
@@ -1325,7 +1359,7 @@ L.sort((x,y)=>fn(x.fl)-fn(y.fl));
 const G={};L.forEach(x=>(G[x.cn]=G[x.cn]||[]).push((multi?x.fl+' :: ':'')+x.txt));
 const flab=multi?'Tầng '+used.map(x=>fn(x)).join(', '):used[0],ks=Object.keys(G).sort();
 ks.forEach(c=>{const r=Object.assign(nr(),QI);
-Object.assign(r,{thap:th,tang:used[0],can:c,hm:hm,loai:lo,vt:th==KD_T?KD_T:flab+'-'+th+(c?' - '+c:''),ten:($('qten').value||'').trim()||'Nghiệm thu '+lo,ct:G[c].join('; '),ghichu:JSON.stringify(notes),evid:newEv(),posted:''});S.rows.push(r)});
+Object.assign(r,{thap:th,tang:used[0],can:c,hm:hm,loai:lo,vt:th==KD_T?KD_T:flab+'-'+th+(c?' - '+c:''),ten:($('qten').value||'').trim()||'Nghiệm thu '+lo,ct:G[c].join('; '),ghichu:JSON.stringify(notes),evid:newEv(),posted:''});const from2=S.rows.length;S.rows.push(r);numberNewRows(from2)});
 const n=S.rows.length;if(n>VB){const w=VB-VA;VB=n;VA=Math.max(1,VB-w)}cur=n-1;
 qTenT=false;sv();ui();qfItems();qfMsg('Đang ghi lũy kế và gửi Google… ('+ks.length+' biên bản'+(multi?', gộp '+used.length+' tầng':'')+')');qfOK=true};
 function sendAll(){doPush()}
