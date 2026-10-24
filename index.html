@@ -223,7 +223,7 @@ button,input,select,textarea{font-family:inherit}
 </details>
     <!-- ===================================== -->
 <details open id="drive-lib"><summary>📤 Up dữ liệu — kho lưu trữ biên bản nghiệm thu (đồng bộ với Google Drive)</summary><div class="in">
-<p style="color:var(--mu);font-size:12px;margin:0 0 8px">Nghiệm thu xong, tạo thư mục (ví dụ theo ngày / tháp / tầng) rồi up biên bản đã ký, ảnh, PDF, Word, Excel… lên đây. Tệp hiện ngay tại đây và nằm trong thư mục “HoSoNghiemThu_TaiLieu” trên Google Drive. Mỗi tệp tối đa 18 MB.</p>
+<p style="color:var(--mu);font-size:12px;margin:0 0 8px">Nghiệm thu xong, tạo thư mục (ví dụ theo ngày / tháp / tầng) rồi up biên bản đã ký, ảnh, PDF, Word, Excel… lên đây. Mỗi người có thư mục riêng trên Google Drive — chỉ bạn thấy, tạo và xóa được tệp trong thư mục của mình. Mỗi tệp tối đa 18 MB.</p>
 <div id="dl-host"></div></div></details>
 <details open id="qf"><summary>0. Phiếu nghiệm thu (chọn vị trí → thông tin hồ sơ → nhập số lượng theo bảng)</summary><div class="in">
 <div class="g">
@@ -348,7 +348,7 @@ if(S.ck3==null)S.ck3=C3;if(S.t3==null)S.t3='VÁCH KÍNH PHÒNG TẮM // SHOWER S
 if(['LẮP DỰNG KHUNG PHỤ // SUBFRAME INSTALLATION','LẮP DỰNG KHUNG CỬA // DOOR/WINDOW FRAME INSTALLATION'].includes(S.t1))S.t1=T1;
 if(['LẮP DỰNG KHUNG CHÍNH // MAINFRAME INSTALLATION','LẮP ĐẶT CỬA // DOOR/WINDOW INSTALLATION'].includes(S.t2))S.t2=T2;mgck();
 S.g=S.g||{};S.m=Object.assign({t:8,b:12,l:10,r:10,fit:1},S.m||{});S.hf=Object.assign({h:'',f:'',ha:'c',fa:'c'},S.hf||{});GF.forEach(f=>{if(S.g[f[0]]==null)S.g[f[0]]=f[2]});
-const $=i=>document.getElementById(i),ls=()=>{try{if(UID)localStorage.setItem('hsnt_d_'+UID,JSON.stringify({s:S,rev:REV,dirty:dirty}))}catch(e){}},sv=()=>{push();ls();ap();scheduleAutoSave()};
+const $=i=>document.getElementById(i),ls=()=>{try{if(UID)localStorage.setItem('hsnt_d_'+UID,JSON.stringify({s:S,rev:REV,dirty:dirty},(k,v)=>k==='photoReport'?undefined:v))}catch(e){}},sv=()=>{push();ls();ap();scheduleAutoSave()};
 const nr=()=>{const r={};COLS.forEach(c=>r[c[0]]=c[2]=='d'?'':c[2]);return r};
 const HID=['thap','tang','loai','ct','can','evid','posted','ghichu','ctp'],GRID=()=>COLS.filter(c=>HID.indexOf(c[0])<0);
 const RECORD_CLASSES=['Khung chính','Khung phụ','Lan can','Vách kính'];
@@ -371,23 +371,47 @@ if(text.includes('vach kinh'))return'Vách kính';
 if(text.includes('khung phu')||text.includes('grouting khung phu')||text.includes('subframe'))return'Khung phụ';
 if(text.includes('khung chinh')||text.includes('mainframe'))return'Khung chính';
 return'Khác'}
-function nextRecordNumberForClass(category,skipFrom,skipTo){
+function nextRecordNumberForClass(category){
 let max=null;
 S.rows.forEach((row,index)=>{
 if(recordClass(row)!==category)return;
 const value=String(row.so||'').trim();
-if(!value&&skipFrom!=null&&index>=skipFrom&&index<skipTo)return;
+if(!value&&row._needNo)return;
 const number=value?(/^\d+$/.test(value)?Number(value):NaN):index+1;
 if(Number.isSafeInteger(number)&&number>=0)max=max===null?number:Math.max(max,number)});
 const local=max===null?undefined:max+1,srv=nextRecordNumbers[category],server=Number.isInteger(srv)?srv:undefined;
 if(local===undefined)return server;if(server===undefined)return local;
 return Math.max(local,server)}
-/* số biên bản dùng chung: lấy số lớn nhất của TOÀN BỘ dữ liệu (mọi người dùng + dòng đang nhập), mỗi biên bản mới nhận 1 số riêng */
+/* ---- Số biên bản dùng chung: biên bản mới được đánh dấu _needNo, số do SERVER cấp (có khóa) ngay trước khi lưu ---- */
+let numBusy=false;
 function numberNewRows(from,to){
 if(to==null)to=S.rows.length;
-for(let i=from;i<to;i++){const r=S.rows[i];if(!r||String(r.so||'').trim())continue;
-const c=recordClass(r);if(c==='Khác')continue;
-const n=nextRecordNumberForClass(c,from,to);if(Number.isInteger(n))r.so=String(n)}}
+for(let i=from;i<to;i++){const r=S.rows[i];if(!r||String(r.so||'').trim())continue;r._needNo=1;r._autoNo=0}}
+function rowNoTouch(r,k){
+if(k==='so'){r._autoNo=0;r._needNo=0;return}
+if(r._autoNo&&recordClass(r)!==r._noClass){r.so='';r._autoNo=0;r._needNo=1}}
+function localFloors(){
+const f={};S.rows.forEach(r=>{if(r._needNo)return;const v=String(r.so||'').trim();if(!/^\d+$/.test(v))return;const c=recordClass(r);if(c==='Khác')return;f[c]=Math.max(f[c]||0,Number(v))});return f}
+async function assignPendingNumbers(){
+if(numBusy)return false;
+const pend=[];
+S.rows.forEach((r,i)=>{if(!r._needNo)return;if(String(r.so||'').trim()){r._needNo=0;return}if(recordClass(r)!=='Khác')pend.push(i)});
+if(!pend.length)return false;
+numBusy=true;
+try{
+const items={};pend.forEach(i=>{const c=recordClass(S.rows[i]);items[c]=(items[c]||0)+1});
+let start=null;
+try{const j=await call('reserve_numbers',{items:items,floors:localFloors()});start=j.start||null;applyNextRecordNumbers(j.nextRecordNumbers)}
+catch(e){if(e&&e.code=='session')throw e;start=null}   // server chưa cập nhật/lỗi mạng -> tạm tính bằng số đã biết
+const nx={};let changed=false;
+pend.forEach(i=>{const r=S.rows[i];if(!r||!r._needNo||String(r.so||'').trim())return;
+const c=recordClass(r);let n;
+if(start&&Number.isInteger(start[c])){nx[c]=nx[c]==null?start[c]:nx[c]+1;n=nx[c]}else n=nextRecordNumberForClass(c);
+if(Number.isInteger(n)){r.so=String(n);r._needNo=0;r._autoNo=1;r._noClass=c;changed=true;
+document.querySelectorAll('[data-r="'+i+'"][data-k="so"]').forEach(el=>{el.value=r.so})}});
+if(changed){dirty=true;mark();ls();renderRecordClasses()}
+return changed}
+finally{numBusy=false}}
 function tableColumnValue(row,index,key){
 if(key==='__class')return recordClass(row);
 if(key==='__stt')return String(index+1);
@@ -496,14 +520,27 @@ const suggested=signature+'#'+count;
 if(!row._photoKey||used.has(row._photoKey))row._photoKey=suggested+(used.has(suggested)?'#'+index:'');
 used.add(row._photoKey)
 })}
+const photoTouched=new Set();
+const PH_DB={p:null,
+open(){if(this.p)return this.p;this.p=new Promise((ok,bad)=>{try{const r=indexedDB.open('hsnt_photos_db',1);r.onupgradeneeded=()=>r.result.createObjectStore('reports');r.onsuccess=()=>ok(r.result);r.onerror=()=>bad(r.error)}catch(e){bad(e)}});return this.p},
+async put(k,v){const db=await this.open();return new Promise((ok,bad)=>{const t=db.transaction('reports','readwrite');t.objectStore('reports').put(v,k);t.oncomplete=()=>ok();t.onerror=()=>bad(t.error);t.onabort=()=>bad(t.error)})},
+async all(prefix){const db=await this.open();return new Promise((ok,bad)=>{const out={},t=db.transaction('reports','readonly'),rq=t.objectStore('reports').openCursor(IDBKeyRange.bound(prefix,prefix+'\uffff'));rq.onsuccess=()=>{const c=rq.result;if(c){out[c.key.slice(prefix.length)]=c.value;c.continue()}else ok(out)};rq.onerror=()=>bad(rq.error)})}};
+/* Ảnh lưu trong IndexedDB (dung lượng lớn, hàng trăm MB) thay vì localStorage (~5 MB). Dữ liệu cũ trong localStorage tự chuyển sang. */
 function loadPhotoStore(){
 const owner=UID||'local';
 if(photoStoreOwner===owner)return;
-photoStoreOwner=owner;photoStore={};
-photoStoreError='';
-try{photoStore=JSON.parse(localStorage.getItem('hsnt_photos_'+owner)||'{}')||{}}
+photoStoreOwner=owner;photoStore={};photoStoreError='';photoTouched.clear();
+let legacy={};
+try{legacy=JSON.parse(localStorage.getItem('hsnt_photos_'+owner)||'{}')||{}}
 catch(error){photoStoreError='Không đọc được ảnh đã lưu trên thiết bị: '+error.message}
-}
+Object.assign(photoStore,legacy);
+PH_DB.all(owner+'|').then(async data=>{
+if(photoStoreOwner!==owner)return;
+Object.keys(data).forEach(k=>{if(!photoTouched.has(k))photoStore[k]=data[k]});
+const lk=Object.keys(legacy);
+if(lk.length){try{for(const k of lk)if(!(k in data))await PH_DB.put(owner+'|'+k,legacy[k]);localStorage.removeItem('hsnt_photos_'+owner)}catch(e){}}
+photoEditorRender();ap()
+}).catch(error=>{photoStoreError='Không mở được kho ảnh IndexedDB ('+(error&&error.message||error)+'); dùng tạm localStorage (dung lượng nhỏ).'})}
 function photoReportFor(row){
 if(!row.photoReport||typeof row.photoReport!=='object')row.photoReport={images:['','','',''],attachment:'',comment:'',distribution:''};
 if(!Array.isArray(row.photoReport.images))row.photoReport.images=['','',''];
@@ -516,10 +553,13 @@ if(empty)return{images:['','','',''],attachment:'',comment:'',distribution:''};
 return{images:[0,1,2,3].map(index=>String(report&&report.images&&report.images[index]||'')),
 attachment:String(report&&report.attachment||''),comment:String(report&&report.comment||''),distribution:String(report&&report.distribution||'')}}
 function savePhotoReport(row){
-const status=$('photo-status');
-photoStore[row._photoKey]=photoReportFor(row);
-try{localStorage.setItem('hsnt_photos_'+(UID||'local'),JSON.stringify(photoStore));photoStoreError='';status.textContent='Ảnh và thông tin phiếu đã lưu trên trình duyệt này.';return true}
-catch(error){photoStoreError='Không lưu được ảnh trên thiết bị ('+error.message+'). Hãy giảm dung lượng ảnh hoặc gỡ ảnh cũ; dữ liệu Google Sheet không bị thay đổi.';status.textContent=photoStoreError;return false}}
+const status=$('photo-status'),key=row._photoKey,owner=UID||'local',rep=photoReportFor(row);
+photoStore[key]=rep;photoTouched.add(key);
+const snap=JSON.parse(JSON.stringify(rep));
+PH_DB.put(owner+'|'+key,snap).then(()=>{photoStoreError=''}).catch(()=>{
+try{localStorage.setItem('hsnt_photos_'+owner,JSON.stringify(photoStore));photoStoreError=''}
+catch(error){photoStoreError='Không lưu được ảnh trên thiết bị ('+error.message+'). Hãy gỡ bớt ảnh cũ; dữ liệu Google Sheet không bị thay đổi.';status.textContent=photoStoreError}});
+status.textContent='Ảnh và thông tin phiếu đã lưu trên thiết bị này (kho ảnh lớn).';return true}
 function photoEditorRender(){
 const select=$('photo-row');if(!select)return;
 ensurePhotoKeys();loadPhotoStore();
@@ -604,7 +644,7 @@ document.querySelectorAll('#excel-filter-menu .excel-filter-option').forEach(opt
 });
 document.getElementById('reset-table-filters').onclick=()=>{Object.keys(TABLE_FILTERS).forEach(key=>delete TABLE_FILTERS[key]);Object.keys(QF_TABLE_FILTERS).forEach(key=>delete QF_TABLE_FILTERS[key]);selectedRecordClass='';tableSort={key:'',direction:1};qfApplyTableFilters();VA=1;ui()};
 document.addEventListener('input',e=>{const t=e.target;if(t.closest('#excel-filter-menu'))return;
-if(t.dataset.g)S.g[t.dataset.g]=t.value;else if(t.dataset.r!=null){S.rows[t.dataset.r][t.dataset.k]=t.value;const row=document.querySelector(`#tb tr[data-index="${t.dataset.r}"]`);if(row){if(compactEntry)updateCompactSummaryRow(Number(t.dataset.r));else row.cells[1].textContent=recordClass(S.rows[t.dataset.r]);row.hidden=!rowMatchesFilters(S.rows[t.dataset.r],Number(t.dataset.r))}renderRecordClasses();vr()}
+if(t.dataset.g)S.g[t.dataset.g]=t.value;else if(t.dataset.r!=null){S.rows[t.dataset.r][t.dataset.k]=t.value;rowNoTouch(S.rows[t.dataset.r],t.dataset.k);const row=document.querySelector(`#tb tr[data-index="${t.dataset.r}"]`);if(row){if(compactEntry)updateCompactSummaryRow(Number(t.dataset.r));else row.cells[1].textContent=recordClass(S.rows[t.dataset.r]);row.hidden=!rowMatchesFilters(S.rows[t.dataset.r],Number(t.dataset.r))}renderRecordClasses();vr()}
 else if(t.id=='vl')S.vl=t.value;else if(t.id=='ck1')S.ck1=t.value;else if(t.id=='ck2')S.ck2=t.value;else if(t.id=='ck3')S.ck3=t.value;else if(t.id=='ck4')S.ck4=t.value;else if(t.id=='ckt1')S.t1=t.value;else if(t.id=='ckt2')S.t2=t.value;else if(t.id=='ckt3')S.t3=t.value;else if(t.id=='ckt4')S.t4=t.value;sv()});
 document.getElementById('entry-layout-toggle').addEventListener('click',()=>{
 compactEntry=!compactEntry;
@@ -614,8 +654,8 @@ ui()
 document.addEventListener('click',e=>{const t=e.target.closest('[data-edit]')||e.target;
 if(t.dataset.edit!=null){const index=Number(t.dataset.edit);editingRecord=editingRecord===index?null:index;ui();return}
 if(t.dataset.del!=null){const idx=Number(t.dataset.del);if(!confirm('Xóa dòng '+(idx+1)+'? Thay đổi sẽ được đồng bộ lên Google Sheet.'))return;S.rows.splice(idx,1);if(editingRecord===idx)editingRecord=null;else if(editingRecord>idx)editingRecord--;sv();ui()}
-if(t.dataset.dup!=null){const idx=Number(t.dataset.dup),original=S.rows[idx],copy={...original,photoReport:clonePhotoReport(photoReportFor(original),false)};delete copy._photoKey;copy.so='';S.rows.splice(idx+1,0,copy);numberNewRows(idx+1,idx+2);if(editingRecord>idx)editingRecord++;sv();ui()}});
-$('add').onclick=()=>{const l=S.rows[S.rows.length-1],row=l?{...l,so:'',photoReport:clonePhotoReport(null,true)}:nr();delete row._photoKey;S.rows.push(row);numberNewRows(S.rows.length-1);cur=S.rows.length-1;if(S.rows.length>VB){const w=VB-VA;VB=S.rows.length;VA=Math.max(1,VB-w)}sv();ui()};
+if(t.dataset.dup!=null){const idx=Number(t.dataset.dup),original=S.rows[idx],copy={...original,photoReport:clonePhotoReport(photoReportFor(original),false)};delete copy._photoKey;copy.so='';copy._autoNo=0;copy._needNo=0;S.rows.splice(idx+1,0,copy);numberNewRows(idx+1,idx+2);if(editingRecord>idx)editingRecord++;sv();ui()}});
+$('add').onclick=()=>{const l=S.rows[S.rows.length-1],row=l?{...l,so:'',_autoNo:0,_needNo:0,photoReport:clonePhotoReport(null,true)}:nr();delete row._photoKey;S.rows.push(row);numberNewRows(S.rows.length-1);cur=S.rows.length-1;if(S.rows.length>VB){const w=VB-VA;VB=S.rows.length;VA=Math.max(1,VB-w)}sv();ui()};
 $('clr').onclick=()=>{if(confirm('Xóa toàn bộ dòng dữ liệu trên giao diện và đồng bộ danh sách mới lên Google Sheet?')){S.rows=[];sv();ui()}};
 $('paste').onclick=()=>{const t=prompt('Dán các dòng copy từ Excel (đúng thứ tự cột như bảng, ngày dạng dd/mm/yyyy):');if(!t)return;
 const from0=S.rows.length;t.split(/\r?\n/).filter(x=>x.trim()).forEach(l=>{const v=l.split('\t'),r=nr();COLS.forEach((c,i)=>{let x=(v[i]||'').trim();if(c[2]=='d'){const m=x.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);x=m?`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`:x}r[c[0]]=x||r[c[0]]});S.rows.push(r)});numberNewRows(from0);sv();ui()};
@@ -680,7 +720,7 @@ const OLD_CFG_URL='https://script.google.com/macros/s/AKfycbx13YZZxkbggnueggZf7E
 let CF={};try{CF=JSON.parse(localStorage.getItem('hsnt_cfg'))||{}}catch(e){}if(CF.url===OLD_CFG_URL)CF.url=CFG0.url;CF=Object.assign({},CFG0,CF);
 var TK='',UID='',UNAME='',REV=0,FORCE=false;
 /* ===== Gọi backend: timeout + tự thử lại + xếp hàng ghi (tránh request treo / chạy song song) ===== */
-const WRITE_ACTS=new Set(['save','luyke_post','luyke_set','luyke_x_set','drive_mkdir','drive_upload','drive_trash']);
+const WRITE_ACTS=new Set(['save','luyke_post','luyke_set','luyke_x_set','drive_mkdir','drive_upload','drive_trash','reserve_numbers']);
 const RETRY_ACTS=new Set(['load','luyke','luyke_get','luyke_x_get','luyke_sync','luyke_x_sync','luyke_post','drive_list','drive_get']);
 const DEDUPE_ACTS=new Set(['luyke_get','luyke_x_get','luyke']);
 let writeQ=Promise.resolve();const inflight=new Map();
@@ -689,11 +729,25 @@ try{const r=await fetch(CF.url.trim(),{method:'POST',headers:{'Content-Type':'te
 if(!r.ok){const e=new Error('HTTP '+r.status);e.code='http';throw e}return await r.json()}
 catch(e){if(e&&e.name==='AbortError'){const x=new Error('Máy chủ phản hồi quá lâu, hãy thử lại');x.code='timeout';throw x}throw e}finally{clearTimeout(t)}}
 async function callOnce(act,p){const j=await postRaw(act,p,act==='chat'?120000:60000);
-if(!j.ok){const e=new Error(j.error==='server'&&j.message?j.message:(j.error||'lỗi'));e.code=j.error;throw e}if(j.rev)REV=j.rev;return j}
+if(!j.ok){const e=new Error(j.error==='server'&&j.message?j.message:(j.error||'lỗi'));e.code=j.error;e.data=j;throw e}if(j.rev)REV=j.rev;return j}
 async function callRetry(act,p){let wait=700;for(let i=0;;i++){try{return await callOnce(act,p)}catch(e){
 const net=e&&(e.code==='busy'||e.code==='timeout'||e.code==='http'||e.message==='Failed to fetch');
 if(!net||i>=3||(e.code!=='busy'&&!RETRY_ACTS.has(act)))throw e;await new Promise(r=>setTimeout(r,wait+Math.random()*300));wait*=2}}}
-function call(act,p){
+/* Lưu bị từ chối vì số biên bản trùng -> tự xin số mới từ server cho các dòng trùng rồi lưu lại (chạy ngoài hàng đợi ghi) */
+async function fixDupNumbers(dups){
+const info=[];
+dups.forEach(d=>{const r=S.rows[d.row];if(!r)return;info.push({i:d.row,no:d.no});r.so='';r._autoNo=0;r._needNo=1});
+while(numBusy)await new Promise(r=>setTimeout(r,100));
+await assignPendingNumbers();
+const msg=info.map(x=>'STT '+(x.i+1)+': số '+x.no+' đã có người dùng → đổi thành '+((S.rows[x.i]&&S.rows[x.i].so)||'(chờ cấp)')).join('\n');
+try{ui()}catch(e){}
+stat('⚠ Số biên bản bị trùng đã được tự đổi: '+msg.replace(/\n/g,'; '));
+alert('Số biên bản trùng với người khác nên đã được đổi sang số mới:\n'+msg+'\n\nHãy in lại/kiểm tra các biên bản này.')}
+async function saveWithDup(p){
+try{return await callQ('save',p)}
+catch(e){if(e&&e.code==='dup_number'&&e.data&&Array.isArray(e.data.dups)){await fixDupNumbers(e.data.dups);return await callQ('save',payload())}throw e}}
+function call(act,p){return act==='save'?saveWithDup(p):callQ(act,p)}
+function callQ(act,p){
 if(WRITE_ACTS.has(act)){const run=()=>callRetry(act,p),x=writeQ.then(run,run);writeQ=x.catch(()=>{});return x}
 if(DEDUPE_ACTS.has(act)){const k=act+JSON.stringify(p||{});if(inflight.has(k))return inflight.get(k);const x=callRetry(act,p).finally(()=>inflight.delete(k));inflight.set(k,x);return x}
 return callRetry(act,p)}
@@ -743,7 +797,7 @@ $('pdf').onclick=()=>{if(build(true))fit().then(()=>setTimeout(()=>window.print(
 window.addEventListener('afterprint',()=>build());
 /* đồng bộ Google Sheet – đăng nhập theo người dùng, gửi thủ công */
 function mark(){$('snd').textContent=(dirty?'● ':'')+'Gửi dữ liệu về Google'}
-function payload(){return{chi_tiet:buildCT(),data:[COLS.map(c=>c[1])].concat(S.rows.map(r=>COLS.map(c=>c[2]=='d'?F2(r[c[0]]):(r[c[0]]||'')))),chung:[['Khóa','Giá trị']].concat(GF.map(f=>[f[0],S.g[f[0]]||''])).concat(Object.keys(CAT0).map(k=>['cat_'+k,cat()[k]])).concat([['vl',S.vl],['ck1',S.ck1],['ck2',S.ck2],['ck3',S.ck3],['ck4',S.ck4],['t1',S.t1],['t2',S.t2],['t3',S.t3],['t4',S.t4],['ckv',S.ckv],['mg',[S.m.t,S.m.b,S.m.l,S.m.r,S.m.fit].join(',')],['hf',JSON.stringify(S.hf)]])}}
+function payload(){return{floors:localFloors(),chi_tiet:buildCT(),data:[COLS.map(c=>c[1])].concat(S.rows.map(r=>COLS.map(c=>c[2]=='d'?F2(r[c[0]]):(r[c[0]]||'')))),chung:[['Khóa','Giá trị']].concat(GF.map(f=>[f[0],S.g[f[0]]||''])).concat(Object.keys(CAT0).map(k=>['cat_'+k,cat()[k]])).concat([['vl',S.vl],['ck1',S.ck1],['ck2',S.ck2],['ck3',S.ck3],['ck4',S.ck4],['t1',S.t1],['t2',S.t2],['t3',S.t3],['t4',S.t4],['ckv',S.ckv],['mg',[S.m.t,S.m.b,S.m.l,S.m.r,S.m.fit].join(',')],['hf',JSON.stringify(S.hf)]])}}
 let autoSaveTimer=null,autoSaving=false,changeSeq=0;
 function push(){if(!GAS||!ready)return;dirty=true;changeSeq++;mark();stat('● Có thay đổi — đang chờ đồng bộ Google Sheet…')}
 function scheduleAutoSave(){
@@ -754,10 +808,11 @@ function scheduleAutoSave(){
 async function autoSaveToGoogle(){
   if(!GAS||!ready||!dirty)return;
   if(busy||autoSaving){autoSaveTimer=setTimeout(autoSaveToGoogle,1200);return}
-  const seq=changeSeq;
   autoSaving=true;
   stat('Đang tự động đồng bộ thay đổi lên Google Sheet…');
   try{
+    await assignPendingNumbers();
+    const seq=changeSeq;
     const saved=await call('save',payload());
     applyNextRecordNumbers(saved.nextRecordNumbers);
     if(seq===changeSeq){
@@ -777,7 +832,7 @@ const els=()=>[...document.querySelectorAll('[data-updmsg="'+i+'"]')],say=t=>els
 if(!GAS||!ready||!TK){say('Chưa đăng nhập hoặc chưa tải xong dữ liệu.');return}
 if(busy||autoSaving){say('Đang đồng bộ, thử lại sau giây lát.');return}
 clearTimeout(autoSaveTimer);autoSaving=true;say('Đang lưu lên Google…');const seq=changeSeq;
-try{let saved;
+try{let saved;await assignPendingNumbers();
 try{saved=await call('save',payload())}
 catch(e){if(e&&e.code=='conflict'&&confirm('Dữ liệu trên Google vừa được sửa ở máy/tab khác.\nGhi đè bằng dữ liệu đang hiển thị?')){FORCE=true;try{saved=await call('save',payload())}finally{FORCE=false}}else throw e}
 applyNextRecordNumbers(saved.nextRecordNumbers);$('cf').style.display='none';
@@ -790,8 +845,8 @@ say('⚠ Chưa lưu được: '+em(e)+' — dữ liệu vẫn còn trên màn h�
 finally{autoSaving=false}}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-upd]');if(b){e.preventDefault();updateRecord(+b.dataset.upd)}});
 async function refreshRecordNumbers(){if(!GAS||!ready||!TK||busy||autoSaving)return;try{const j=await call('record_numbers');applyNextRecordNumbers(j.nextRecordNumbers)}catch(e){}}
-setInterval(refreshRecordNumbers,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshRecordNumbers()});
-function doPush(){if(busy)return;if(!GAS||!ready){stat('Chưa đăng nhập hoặc chưa tải xong dữ liệu.');return}busy=true;stat('Đang ghi lũy kế và gửi lên Google Sheet…');
+setInterval(refreshRecordNumbers,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshRecordNumbers()});
+async function doPush(){if(busy)return;while(numBusy)await new Promise(r=>setTimeout(r,100));if(!GAS||!ready){stat('Chưa đăng nhập hoặc chưa tải xong dữ liệu.');return}try{await assignPendingNumbers()}catch(e){if(e&&e.code=='session'){showLogin('Phiên đăng nhập hết hạn, hãy đăng nhập lại.');return}}if(busy)return;busy=true;stat('Đang ghi lũy kế và gửi lên Google Sheet…');
 const evs=evList(),rows=S.rows.filter(r=>r.ct&&r.thap&&r.loai&&r.posted!='1');let lkNote='';
 const save=()=>GAS.withSuccessHandler(()=>{busy=false;FORCE=false;dirty=false;mark();ls();$('cf').style.display='none';qfLK();stat('Đã gửi dữ liệu về Google lúc '+new Date().toLocaleTimeString('vi-VN')+lkNote);qfMsg('✔ Xong biên bản — đã gửi Google lúc '+new Date().toLocaleTimeString('vi-VN')+lkNote);if(document.querySelector('.app').classList.contains('quick-layout-mode'))$('qquick-message').textContent='✔ Đã lưu '+rows.length+' biên bản lên Google.'+lkNote}).withFailureHandler(e=>{busy=false;
 if(e&&e.code=='session'){showLogin('Phiên đăng nhập hết hạn, hãy đăng nhập lại (dữ liệu chưa gửi vẫn được giữ trên máy).');return}
