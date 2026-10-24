@@ -65,7 +65,7 @@ table.gr{border-collapse:collapse;min-width:2000px}
 .excel-filter-option input{width:auto;margin:0}
 .excel-filter-footer{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
 #lkw table.gr{min-width:1250px}#lkw .tw{max-height:60vh}#lkw table.gr th.lk-blue{background:#0070c0;color:#fff}#lkw table.gr th.lk-green{background:#00a651;color:#fff}#lkw table.gr th.lk-orange{background:#ed7d31;color:#fff}#lkw table.gr th.lk-lime{background:#70ad47;color:#fff}#lkw table.gr td input[type=number]{min-width:70px;text-align:center}#lkw .lk-sum{display:flex;flex-wrap:wrap;gap:14px;margin:6px 0 10px;font-weight:600}#lkw .lk-sum span{white-space:nowrap}
-#qk .qf-entry{min-width:1250px}#qk .qf-entry td{padding:2px 4px}#qk .qf-entry td.qf-num{text-align:center;white-space:nowrap}#qk .qf-entry input{min-width:95px;min-height:30px;background:var(--pn)}#qk .qf-entry input[data-qd]{min-width:90px;text-align:center;border-color:var(--ac)}#qk .qf-entry input[data-qnote]{min-width:180px}#qk .qf-floor{margin:8px 0 12px}#qk .qf-floor h3{margin:8px 0 4px;font-size:14px}
+#qk .qf-entry{min-width:1250px}#qk .qf-entry td.qf-prev-edit{cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}#qk .qf-entry td.qf-prev-edit:hover{background:var(--ac2)}#qk .qf-entry td{padding:2px 4px}#qk .qf-entry td.qf-num{text-align:center;white-space:nowrap}#qk .qf-entry input{min-width:95px;min-height:30px;background:var(--pn)}#qk .qf-entry input[data-qd]{min-width:90px;text-align:center;border-color:var(--ac)}#qk .qf-entry input[data-qnote]{min-width:180px}#qk .qf-floor{margin:8px 0 12px}#qk .qf-floor h3{margin:8px 0 4px;font-size:14px}
 #qk .qf-entry tfoot td{background:var(--ac2);font-weight:700;padding:6px 8px}#qk .qf-entry input.qf-invalid{border:1px solid #c0392b!important;background:#fdecea!important}#qk .qf-entry input.qf-cell-selected{background:#d9eee7!important;outline:1px solid var(--ac);outline-offset:-1px}#qk .qf-status-invalid{color:#c0392b}#qk .qf-status-valid{color:var(--ac)}
 #photo-entry .photo-files{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
 #photo-entry .photo-upload{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px;border:1px solid var(--bd);border-radius:7px;background:var(--bg)}
@@ -372,12 +372,16 @@ if(text.includes('khung phu')||text.includes('grouting khung phu')||text.include
 if(text.includes('khung chinh')||text.includes('mainframe'))return'Khung chính';
 return'Khác'}
 function nextRecordNumberForClass(category){
+/* HIỂN THỊ: dùng số CHUNG do server tính trên dữ liệu của mọi user -> tài khoản nào cũng thấy giống nhau. Chỉ khi server chưa trả số mới tạm tính theo máy này */
+const shared=nextRecordNumbers[category];if(Number.isInteger(shared))return shared;
+return nextRecordNumberLocalMax(category)}
+function nextRecordNumberLocalMax(category){
 let max=null;
 S.rows.forEach((row,index)=>{
 if(recordClass(row)!==category)return;
 const value=String(row.so||'').trim();
 if(!value&&row._needNo)return;
-const number=value?(/^\d+$/.test(value)?Number(value):NaN):index+1;
+const number=value&&/^\d+$/.test(value)?Number(value):NaN;   /* chỉ số biên bản thật, bỏ STT */
 if(Number.isSafeInteger(number)&&number>=0)max=max===null?number:Math.max(max,number)});
 const local=max===null?undefined:max+1,srv=nextRecordNumbers[category],server=Number.isInteger(srv)?srv:undefined;
 if(local===undefined)return server;if(server===undefined)return local;
@@ -406,7 +410,7 @@ catch(e){if(e&&e.code=='session')throw e;start=null}   // server chưa cập nh�
 const nx={};let changed=false;
 pend.forEach(i=>{const r=S.rows[i];if(!r||!r._needNo||String(r.so||'').trim())return;
 const c=recordClass(r);let n;
-if(start&&Number.isInteger(start[c])){nx[c]=nx[c]==null?start[c]:nx[c]+1;n=nx[c]}else n=nextRecordNumberForClass(c);
+if(start&&Number.isInteger(start[c])){nx[c]=nx[c]==null?start[c]:nx[c]+1;n=nx[c]}else n=nextRecordNumberLocalMax(c);
 if(Number.isInteger(n)){r.so=String(n);r._needNo=0;r._autoNo=1;r._noClass=c;changed=true;
 document.querySelectorAll('[data-r="'+i+'"][data-k="so"]').forEach(el=>{el.value=r.so})}});
 if(changed){dirty=true;mark();ls();renderRecordClasses()}
@@ -1070,7 +1074,7 @@ function qfEntryItems(tgx,k,hm,lo){
  if(hm===HM_KD)return KD.map(r=>({n:r[0],type:'',width:'',height:'',total:r[1],can:''}));
  return lo?[{n:lo,type:lo,width:'',height:'',total:'',can:''}]:[]
 }
-const qfEntryRow=(item,th,fl,hm,lo,note)=>`<tr data-qf-item data-thap="${esc(th)}" data-floor="${esc(fl)}" data-can="${esc(item.can||'')}" data-hm="${esc(hm)}" data-loai="${esc(lo)}" data-name="${esc(item.n)}" data-total="${item.total===''?'':esc(item.total)}"><td class="n">${esc(th.replace(/^Tháp\s*/i,''))}</td><td class="n">${esc(fl)}</td><td>${esc(item.n)}</td><td>${esc(item.type||'')}</td><td class="n">${item.width===''?'':lkNum(item.width).toLocaleString('vi-VN')}</td><td class="n">${item.height===''?'':lkNum(item.height).toLocaleString('vi-VN')}</td><td class="n">${item.total===''?'':lkNum(item.total).toLocaleString('vi-VN')}</td><td class="n" data-qf-prev>0</td><td><input type="text" inputmode="numeric" autocomplete="off" data-qd aria-label="Nghiệm thu kỳ này ${esc(item.n)}"></td><td><input type="text" autocomplete="off" data-qnote value="${esc(note||'')}" aria-label="Ghi chú ${esc(item.n)}"></td></tr>`;
+const qfEntryRow=(item,th,fl,hm,lo,note)=>`<tr data-qf-item data-thap="${esc(th)}" data-floor="${esc(fl)}" data-can="${esc(item.can||'')}" data-hm="${esc(hm)}" data-loai="${esc(lo)}" data-name="${esc(item.n)}" data-total="${item.total===''?'':esc(item.total)}"><td class="n">${esc(th.replace(/^Tháp\s*/i,''))}</td><td class="n">${esc(fl)}</td><td>${esc(item.n)}</td><td>${esc(item.type||'')}</td><td class="n">${item.width===''?'':lkNum(item.width).toLocaleString('vi-VN')}</td><td class="n">${item.height===''?'':lkNum(item.height).toLocaleString('vi-VN')}</td><td class="n">${item.total===''?'':lkNum(item.total).toLocaleString('vi-VN')}</td><td class="n qf-prev-edit" data-qf-prev title="Bấm để sửa lũy kế">0</td><td><input type="text" inputmode="numeric" autocomplete="off" data-qd aria-label="Nghiệm thu kỳ này ${esc(item.n)}"></td><td><input type="text" autocomplete="off" data-qnote value="${esc(note||'')}" aria-label="Ghi chú ${esc(item.n)}"></td></tr>`;
 function qfItems(){const th=$('qt').value,tg=$('qg').value,hm=$('qh').value,lo=$('ql').value,k=qfK(),b=$('qk'),H=t=>'<label>'+t+'</label>';let h='';
 const ck=qfChecklist(hm,lo);if(ck){QI.ck=ck;const sel=$('qinfo').querySelector('[data-qi="ck"]');if(sel)sel.value=ck}
 const fls=qfFloorsQuiet(true)||[tg],tables=fls.map(floor=>{
@@ -1353,6 +1357,22 @@ if(t.dataset.c){cat()[t.dataset.c]=t.value;sv();qfInit()}
 else if(t.dataset.qi){QI[t.dataset.qi]=t.value}
 else if(t.id=='qten'){qTenT=true;t.dataset.v=t.value}
 else if(t.matches('[data-qd],[data-qnote]')){qfClearGridSelection(t.closest('.qf-entry'));qfPaintAll()}});
+/* Sửa lũy kế thủ công: bấm vào số ở cột "Lũy kế gần nhất" -> ghi 1 dòng điều chỉnh (+/-) vào luy_ke_lich_su, không đè dữ liệu cũ */
+function qfEditPrev(row){
+ if(!ready||!TK||!GAS){qfMsg('Chưa đăng nhập hoặc chưa tải xong dữ liệu.');return}
+ if(busy){qfMsg('Đang xử lý, thử lại sau ít giây.');return}
+ const d=row.dataset,cur=Number(lkCurrent(d.thap,d.floor,d.can,d.hm,d.loai,d.name))||0,total=d.total===''?null:Number(d.total);
+ const ans=prompt('Sửa lũy kế "'+d.name+'" ('+d.floor+')\nHiện tại: '+cur+(total!==null?' / SL '+total:'')+'\nNhập số lũy kế đúng:',String(cur));
+ if(ans===null)return;
+ const v=Number(String(ans).trim());
+ if(String(ans).trim()===''||!Number.isInteger(v)||v<0){qfMsg('Lũy kế phải là số nguyên từ 0 trở lên.');return}
+ if(total!==null&&v>total){qfMsg('"'+d.name+'": lũy kế '+v+' vượt SL '+total+'.');return}
+ if(v===cur){qfMsg('Lũy kế không thay đổi.');return}
+ const ev={id:'adj~'+(UID||'u')+'~'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),thap:d.thap,tang:d.floor,can:d.can||'',hm:d.hm,loai:d.loai,ten:d.name,sl:v-cur,tong:total===null?'':total,ma:'',vt:'',ngnt:'',note:'Điều chỉnh lũy kế thủ công ('+cur+' → '+v+')'};
+ busy=true;qfMsg('Đang ghi điều chỉnh lũy kế…');
+ call('luyke_post',{events:[ev]}).then(j=>{busy=false;lkApplyEventResults([ev],j.lk||{});lkScheduleRefresh();lkXLoad();qfLK();qfPaintAll();qfMsg('✔ Đã sửa lũy kế "'+d.name+'": '+cur+' → '+v+' (lưu ở luy_ke_lich_su).')},
+  e=>{busy=false;if(e&&e.code=='session'){showLogin('Phiên đăng nhập hết hạn, hãy đăng nhập lại.');return}qfMsg('⚠ Không ghi được điều chỉnh lũy kế ('+em(e)+'). Chưa thay đổi gì.')})}
+$('qk').addEventListener('click',e=>{const td=e.target.closest&&e.target.closest('[data-qf-prev]');if(!td)return;const row=td.closest('[data-qf-item]');if(row)qfEditPrev(row)});
 $('qk').addEventListener('keydown',event=>{
  const input=event.target;if(!input.matches('.qf-entry [data-qd],.qf-entry [data-qnote]'))return;
  const table=input.closest('.qf-entry');
