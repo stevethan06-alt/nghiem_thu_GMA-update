@@ -26,6 +26,9 @@ table.gr{border-collapse:collapse;min-width:2000px}
 #record-class-buttons{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
 #record-class-buttons button.class-number-button{background:var(--ac2);border-color:var(--bd);color:var(--ac)}
 #record-class-buttons button.active{border-color:var(--ac);font-weight:700}
+#record-class-buttons .class-group{display:inline-flex;gap:0}
+#record-class-buttons .class-group .class-number-button{border-top-right-radius:0;border-bottom-right-radius:0}
+#record-class-buttons button.class-add{border-top-left-radius:0;border-bottom-left-radius:0;border-left:0;font-weight:700;padding-left:10px;padding-right:10px}
 #entry-table.compact{max-height:60vh}
 #entry-table.compact table.gr{min-width:900px;width:100%;table-layout:fixed}
 #entry-table.compact th:nth-child(1){width:5%}
@@ -389,8 +392,8 @@ if(text.includes('khung chinh')||text.includes('mainframe'))return'Khung chính'
 return'Khác'}
 function nextRecordNumberForClass(category){
 /* HIỂN THỊ: dùng số CHUNG do server tính trên dữ liệu của mọi user -> tài khoản nào cũng thấy giống nhau. Chỉ khi server chưa trả số mới tạm tính theo máy này */
-const shared=nextRecordNumbers[category];if(Number.isInteger(shared))return shared;
-return nextRecordNumberLocalMax(category)}
+const own=nextRecordNumberLocalMax(category);if(Number.isInteger(own))return own;
+const shared=nextRecordNumbers[category];return Number.isInteger(shared)?shared:own}
 function nextRecordNumberLocalMax(category){
 let max=null;
 S.rows.forEach((row,index)=>{
@@ -400,8 +403,8 @@ if(!value&&row._needNo)return;
 const number=value&&/^\d+$/.test(value)?Number(value):NaN;   /* chỉ số biên bản thật, bỏ STT */
 if(Number.isSafeInteger(number)&&number>=0)max=max===null?number:Math.max(max,number)});
 const local=max===null?undefined:max+1,srv=nextRecordNumbers[category],server=Number.isInteger(srv)?srv:undefined;
-if(local===undefined)return server;if(server===undefined)return local;
-return Math.max(local,server)}
+/* số tiếp theo = số biên bản lớn nhất đang có của hạng mục + 1 (xóa biên bản thì số tự giảm); chỉ khi hạng mục chưa có dòng nào mới dùng số server */
+if(local!==undefined)return local;return server}
 /* ---- Số biên bản dùng chung: biên bản mới được đánh dấu _needNo, số do SERVER cấp (có khóa) ngay trước khi lưu ---- */
 let numBusy=false;
 function numberNewRows(from,to){
@@ -426,7 +429,9 @@ catch(e){if(e&&e.code=='session')throw e;start=null}   // server chưa cập nh�
 const nx={};let changed=false;
 pend.forEach(i=>{const r=S.rows[i];if(!r||!r._needNo||String(r.so||'').trim())return;
 const c=recordClass(r);let n;
-if(start&&Number.isInteger(start[c])){nx[c]=nx[c]==null?start[c]:nx[c]+1;n=nx[c]}else n=nextRecordNumberLocalMax(c);
+const ln=nextRecordNumberLocalMax(c);
+if(Number.isInteger(ln))n=ln;
+else if(start&&Number.isInteger(start[c])){nx[c]=nx[c]==null?start[c]:nx[c]+1;n=nx[c]}else n=ln;
 if(Number.isInteger(n)){r.so=String(n);r._needNo=0;r._autoNo=1;r._noClass=c;changed=true;
 document.querySelectorAll('[data-r="'+i+'"][data-k="so"]').forEach(el=>{el.value=r.so})}});
 if(changed){dirty=true;mark();ls();renderRecordClasses()}
@@ -463,7 +468,7 @@ if(tableSort.key)rows.sort((a,b)=>tableColumnValue(a.row,a.index,tableSort.key).
 return rows}
 function renderRecordClasses(){
 const container=$('record-class-buttons');if(!container)return;
-container.innerHTML=RECORD_CLASSES.map(category=>{const next=nextRecordNumberForClass(category);return `<button type="button" class="s class-number-button${selectedRecordClass===category?' active':''}" data-class-filter="${esc(category)}">${esc(category)} · Biên bản tiếp theo: ${Number.isInteger(next)?next:'Chưa có dữ liệu tổng hợp'}</button>`}).join('')+
+container.innerHTML=RECORD_CLASSES.map(category=>{const next=nextRecordNumberForClass(category);return `<span class="class-group"><button type="button" class="s class-number-button${selectedRecordClass===category?' active':''}" data-class-filter="${esc(category)}">${esc(category)} · Biên bản tiếp theo: ${Number.isInteger(next)?next:'Chưa có dữ liệu tổng hợp'}</button><button type="button" class="s class-add" data-class-add="${esc(category)}" title="Thêm dòng mới vào hạng mục ${esc(category)} (lấy nội dung từ biên bản mới nhất, số biên bản +1)">+ Thêm</button></span>`}).join('')+
 (selectedRecordClass?'<button type="button" class="s" data-class-filter="">Bỏ lọc hạng mục</button>':'')}
 function applyNextRecordNumbers(numbers){
 if(!numbers||typeof numbers!=='object')return;
@@ -636,6 +641,8 @@ photoReportFor(row)[input.dataset.photoField]=input.value;savePhotoReport(row);a
 document.addEventListener('click',event=>{
 const button=event.target.closest('[data-filter-key],[data-qf-filter]');
 if(button){event.preventDefault();event.stopPropagation();openExcelFilter(button);return}
+const addClassButton=event.target.closest('[data-class-add]');
+if(addClassButton){addRowForClass(addClassButton.dataset.classAdd);return}
 const classButton=event.target.closest('[data-class-filter]');
 if(classButton){selectedRecordClass=classButton.dataset.classFilter;VA=1;ui();return}
 const menu=event.target.closest('#excel-filter-menu');
@@ -675,6 +682,19 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-edit]')||e
 if(t.dataset.edit!=null){const index=Number(t.dataset.edit);editingRecord=editingRecord===index?null:index;ui();return}
 if(t.dataset.del!=null){const idx=Number(t.dataset.del);if(!confirm('Xóa dòng '+(idx+1)+'? Thay đổi sẽ được đồng bộ lên Google Sheet.'))return;S.rows.splice(idx,1);if(editingRecord===idx)editingRecord=null;else if(editingRecord>idx)editingRecord--;sv();ui()}
 if(t.dataset.dup!=null){const idx=Number(t.dataset.dup),original=S.rows[idx],copy={...original,photoReport:clonePhotoReport(photoReportFor(original),false)};delete copy._photoKey;copy.so='';copy._autoNo=0;copy._needNo=0;S.rows.splice(idx+1,0,copy);numberNewRows(idx+1,idx+2);if(editingRecord>idx)editingRecord++;sv();ui()}});
+/* ---- Thêm dòng theo từng hạng mục: lấy nội dung của biên bản mới nhất cùng hạng mục, số biên bản = số mới nhất + 1 ---- */
+function addRowForClass(category){
+let last=-1,lastNo=-1;
+S.rows.forEach((r,i)=>{if(recordClass(r)!==category)return;const v=String(r.so||'').trim(),n=/^\d+$/.test(v)?Number(v):-1;if(n>=lastNo){lastNo=n;last=i}});
+if(last<0)S.rows.forEach((r,i)=>{if(recordClass(r)===category)last=i});
+const base=last>=0?S.rows[last]:Object.assign(nr(),{hm:category});
+const row={...base,so:'',_autoNo:0,_needNo:0,posted:'',evid:'',ctp:'',photoReport:clonePhotoReport(null,true)};
+delete row._photoKey;delete row._noClass;
+S.rows.push(row);const idx=S.rows.length-1;numberNewRows(idx);cur=idx;
+if(selectedRecordClass&&selectedRecordClass!==category)selectedRecordClass=category;
+if(S.rows.length>VB){const w=VB-VA;VB=S.rows.length;VA=Math.max(1,VB-w)}
+sv();ui();
+assignPendingNumbers().then(()=>ui()).catch(()=>{})}
 $('add').onclick=()=>{const l=S.rows[S.rows.length-1],row=l?{...l,so:'',_autoNo:0,_needNo:0,photoReport:clonePhotoReport(null,true)}:nr();delete row._photoKey;S.rows.push(row);numberNewRows(S.rows.length-1);cur=S.rows.length-1;if(S.rows.length>VB){const w=VB-VA;VB=S.rows.length;VA=Math.max(1,VB-w)}sv();ui()};
 $('clr').onclick=()=>{if(confirm('Xóa toàn bộ dòng dữ liệu trên giao diện và đồng bộ danh sách mới lên Google Sheet?')){S.rows=[];sv();ui()}};
 $('paste').onclick=()=>{const t=prompt('Dán các dòng copy từ Excel (đúng thứ tự cột như bảng, ngày dạng dd/mm/yyyy):');if(!t)return;
