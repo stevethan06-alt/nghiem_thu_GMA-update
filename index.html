@@ -32,11 +32,12 @@ table.gr{border-collapse:collapse;min-width:2000px}
 #entry-table.compact{max-height:60vh}
 #entry-table.compact table.gr{min-width:900px;width:100%;table-layout:fixed}
 #entry-table.compact th:nth-child(1){width:5%}
-#entry-table.compact th:nth-child(2){width:19%}
-#entry-table.compact th:nth-child(3){width:14%}
-#entry-table.compact th:nth-child(4){width:12%}
-#entry-table.compact th:nth-child(5),#entry-table.compact th:nth-child(6){width:18%}
-#entry-table.compact th:nth-child(7){width:14%}
+#entry-table.compact th:nth-child(2){width:8%}
+#entry-table.compact th:nth-child(3){width:17%}
+#entry-table.compact th:nth-child(4){width:13%}
+#entry-table.compact th:nth-child(5){width:11%}
+#entry-table.compact th:nth-child(6),#entry-table.compact th:nth-child(7){width:16%}
+#entry-table.compact th:nth-child(8){width:14%}
 #entry-table.compact .gr th{padding:7px 6px}
 #entry-table.compact .gr td{padding:7px 8px;vertical-align:middle}
 #entry-table.compact .compact-main{font-weight:600;line-height:1.3}
@@ -433,7 +434,7 @@ const ln=nextRecordNumberLocalMax(c);
 if(Number.isInteger(ln))n=ln;
 else if(start&&Number.isInteger(start[c])){nx[c]=nx[c]==null?start[c]:nx[c]+1;n=nx[c]}else n=ln;
 if(Number.isInteger(n)){r.so=String(n);r._needNo=0;r._autoNo=1;r._noClass=c;changed=true;
-document.querySelectorAll('[data-r="'+i+'"][data-k="so"]').forEach(el=>{el.value=r.so})}});
+document.querySelectorAll('[data-r="'+i+'"][data-k="so"]').forEach(el=>{el.value=r.so});const soCell=document.querySelector('#tb tr[data-index="'+i+'"] .compact-so');if(soCell)soCell.textContent=r.so}});
 if(changed){dirty=true;mark();ls();renderRecordClasses()}
 return changed}
 finally{numBusy=false}}
@@ -498,7 +499,7 @@ menu.style.left=left+'px';menu.style.top=top+'px'}
 function ui0(){
 $('gl').innerHTML=GF.map(f=>`<div><label>${f[1]}</label><input data-g="${f[0]}" value="${esc(S.g[f[0]])}"></div>`).join('')+`<div style="grid-column:1/-1"><label>Tài liệu nghiệm thu vật liệu – mỗi dòng "Số/No | Ngày" (dùng cho BBNT nội bộ)</label><textarea id="vl">${esc(S.vl)}</textarea></div>`;
 $('ck1').value=S.ck1;$('ck2').value=S.ck2;$('ck3').value=S.ck3;$('ck4').value=S.ck4;$('ckt1').value=S.t1;$('ckt2').value=S.t2;$('ckt3').value=S.t3;$('ckt4').value=S.t4;
-const compactColumns=[['__stt','STT'],['__work','Tên công việc · Hạng mục'],['__location','Vị trí'],['gui','Ngày gửi'],['__internal','Nghiệm thu nội bộ'],['__acceptance','Nghiệm thu TVGS'],['__actions','Thao tác']];
+const compactColumns=[['__stt','STT'],['so','Số biên bản'],['__work','Tên công việc · Hạng mục'],['__location','Vị trí'],['gui','Ngày gửi'],['__internal','Nghiệm thu nội bộ'],['__acceptance','Nghiệm thu TVGS'],['__actions','Thao tác']];
 const columns=compactEntry?compactColumns:[['__stt','STT'],['__class','Nhóm biên bản'],...GRID().map(c=>[c[0],c[1]])];
 $('entry-table').classList.toggle('compact',compactEntry);
 $('entry-layout-toggle').textContent=compactEntry?'Hiện bảng đầy đủ':'Dùng giao diện gọn';
@@ -507,7 +508,7 @@ $('th').innerHTML='<tr>'+columns.map(([key,title])=>`<th><div class="filter-head
 const rows=filteredRows();
 $('tb').innerHTML=rows.slice(VA-1,VB).map(({row:r,index:i})=>{
 const main=compactEntry
-?`<tr data-index="${i}"><td class="n">${i+1}</td><td class="compact-work"><span class="compact-main">${esc(r.ten||'—')}</span><small class="compact-sub">${esc([r.hm,r.ma].filter(Boolean).join(' · ')||recordClass(r))}</small></td><td class="compact-location"><span class="compact-main">${esc(compactPlace(r).main)}</span><small class="compact-sub">${esc(compactPlace(r).extra)}</small></td><td class="compact-date">${dHtml(r.gui,'—')}</td><td class="compact-internal"><span class="compact-main">${dHtml(r.nd,'Ngày chưa nhập')}</span><small class="compact-sub">${esc([r.ns,r.ne].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small></td><td class="compact-acceptance"><span class="compact-main">${dHtml(r.td,'Ngày chưa nhập')}</span><small class="compact-sub">${esc([r.ts,r.te].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small></td><td class="compact-actions"><button type="button" class="s" data-edit="${i}" aria-expanded="${editingRecord===i}">${editingRecord===i?'Đóng':'✎ Sửa'}</button> <button type="button" class="s" data-upd="${i}" title="Lưu biên bản này lên Google ngay">⟳ Cập nhật</button> <button type="button" class="s" data-dup="${i}" aria-label="Nhân bản biên bản ${i+1}" title="Nhân bản">⧉</button> <button type="button" class="s" data-del="${i}" aria-label="Xóa biên bản ${i+1}" title="Xóa">×</button><small class="upd-msg" data-updmsg="${i}"></small></td></tr>`
+?`<tr data-index="${i}"><td class="n">${i+1}</td><td class="n compact-so">${esc(r.so||'—')}</td><td class="compact-work"><span class="compact-main">${esc(r.ten||'—')}</span><small class="compact-sub">${esc([r.hm,r.ma].filter(Boolean).join(' · ')||recordClass(r))}</small></td><td class="compact-location"><span class="compact-main">${esc(compactPlace(r).main)}</span><small class="compact-sub">${esc(compactPlace(r).extra)}</small></td><td class="compact-date">${dHtml(r.gui,'—')}</td><td class="compact-internal"><span class="compact-main">${dHtml(r.nd,'Ngày chưa nhập')}</span><small class="compact-sub">${esc([r.ns,r.ne].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small></td><td class="compact-acceptance"><span class="compact-main">${dHtml(r.td,'Ngày chưa nhập')}</span><small class="compact-sub">${esc([r.ts,r.te].filter(Boolean).join(' – ')||'Chưa nhập giờ')}</small></td><td class="compact-actions"><button type="button" class="s" data-edit="${i}" aria-expanded="${editingRecord===i}">${editingRecord===i?'Đóng':'✎ Sửa'}</button> <button type="button" class="s" data-upd="${i}" title="Lưu biên bản này lên Google ngay">⟳ Cập nhật</button> <button type="button" class="s" data-dup="${i}" aria-label="Nhân bản biên bản ${i+1}" title="Nhân bản">⧉</button> <button type="button" class="s" data-del="${i}" aria-label="Xóa biên bản ${i+1}" title="Xóa">×</button><small class="upd-msg" data-updmsg="${i}"></small></td></tr>`
 :`<tr data-index="${i}"><td class="n">${i+1}</td><td class="n">${esc(recordClass(r))}</td>${GRID().map(c=>`<td>${c[0]=='ck'?ckSelect(r[c[0]],`data-r="${i}" data-k="${c[0]}"`):`<input data-r="${i}" data-k="${c[0]}" ${c[2]=='d'?'type="text" placeholder="dd/mm/yyyy"':''} value="${esc(c[2]=='d'?F2(r[c[0]]):r[c[0]])}">`}</td>`).join('')}<td class="n"><button class="s" data-upd="${i}">⟳ Cập nhật</button> <button class="s" data-dup="${i}">Nhân bản</button> <button class="s" data-del="${i}">Xóa</button><small class="upd-msg" data-updmsg="${i}"></small></td></tr>`;
 const editor=compactEntry&&editingRecord===i?renderCompactEditor(r,i,columns.length):'';
 return main+editor
@@ -529,6 +530,7 @@ function updateCompactSummaryRow(index){
 if(!compactEntry)return;
 const row=S.rows[index],element=document.querySelector(`#tb tr[data-index="${index}"]`);
 if(!row||!element)return;
+{const so=element.querySelector('.compact-so');if(so)so.textContent=row.so||'—'}
 element.querySelector('.compact-work').innerHTML=`<span class="compact-main">${esc(row.ten||'—')}</span><small class="compact-sub">${esc([row.hm,row.ma].filter(Boolean).join(' · ')||recordClass(row))}</small>`;
 element.querySelector('.compact-location').innerHTML=`<span class="compact-main">${esc(compactPlace(row).main)}</span><small class="compact-sub">${esc(compactPlace(row).extra)}</small>`;
 element.querySelector('.compact-date').innerHTML=dHtml(row.gui,'—');
