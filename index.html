@@ -549,7 +549,7 @@ used.add(row._photoKey)
 })}
 const photoTouched=new Set();
 const PH_DB={p:null,
-open(){if(this.p)return this.p;this.p=new Promise((ok,bad)=>{try{const r=indexedDB.open('hsnt_photos_db',1);r.onupgradeneeded=()=>r.result.createObjectStore('reports');r.onsuccess=()=>ok(r.result);r.onerror=()=>bad(r.error)}catch(e){bad(e)}});return this.p},
+open(){if(this.p)return this.p;this.p=new Promise((ok,bad)=>{try{try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(_){}const r=indexedDB.open('hsnt_photos_db',1);r.onupgradeneeded=()=>r.result.createObjectStore('reports');r.onsuccess=()=>ok(r.result);r.onerror=()=>bad(r.error)}catch(e){bad(e)}});return this.p},
 async put(k,v){const db=await this.open();return new Promise((ok,bad)=>{const t=db.transaction('reports','readwrite');t.objectStore('reports').put(v,k);t.oncomplete=()=>ok();t.onerror=()=>bad(t.error);t.onabort=()=>bad(t.error)})},
 async all(prefix){const db=await this.open();return new Promise((ok,bad)=>{const out={},t=db.transaction('reports','readonly'),rq=t.objectStore('reports').openCursor(IDBKeyRange.bound(prefix,prefix+'\uffff'));rq.onsuccess=()=>{const c=rq.result;if(c){out[c.key.slice(prefix.length)]=c.value;c.continue()}else ok(out)};rq.onerror=()=>bad(rq.error)})}};
 /* Ảnh lưu trong IndexedDB (dung lượng lớn, hàng trăm MB) thay vì localStorage (~5 MB). Dữ liệu cũ trong localStorage tự chuyển sang. */
@@ -560,12 +560,14 @@ photoStoreOwner=owner;photoStore={};photoStoreError='';photoTouched.clear();
 let legacy={};
 try{legacy=JSON.parse(localStorage.getItem('hsnt_photos_'+owner)||'{}')||{}}
 catch(error){photoStoreError='Không đọc được ảnh đã lưu trên thiết bị: '+error.message}
+const perKeyPrefix='hsnt_photo_'+owner+'|',perKeys=[];
+try{for(let i=0;i<localStorage.length;i++){const lk0=localStorage.key(i);if(lk0&&lk0.startsWith(perKeyPrefix))perKeys.push(lk0)}perKeys.forEach(lk0=>{try{legacy[lk0.slice(perKeyPrefix.length)]=JSON.parse(localStorage.getItem(lk0))}catch(e){}})}catch(e){}
 Object.assign(photoStore,legacy);
 PH_DB.all(owner+'|').then(async data=>{
 if(photoStoreOwner!==owner)return;
 Object.keys(data).forEach(k=>{if(!photoTouched.has(k))photoStore[k]=data[k]});
 const lk=Object.keys(legacy);
-if(lk.length){try{for(const k of lk)if(!(k in data))await PH_DB.put(owner+'|'+k,legacy[k]);localStorage.removeItem('hsnt_photos_'+owner)}catch(e){}}
+if(lk.length){try{for(const k of lk)if(!(k in data))await PH_DB.put(owner+'|'+k,legacy[k]);localStorage.removeItem('hsnt_photos_'+owner);perKeys.forEach(k=>localStorage.removeItem(k))}catch(e){}}
 photoEditorRender();ap()
 }).catch(error=>{photoStoreError='Không mở được kho ảnh IndexedDB ('+(error&&error.message||error)+'); dùng tạm localStorage (dung lượng nhỏ).'})}
 function photoReportFor(row){
@@ -579,14 +581,18 @@ function clonePhotoReport(report,empty){
 if(empty)return{images:['','','',''],attachment:'',comment:'',distribution:''};
 return{images:[0,1,2,3].map(index=>String(report&&report.images&&report.images[index]||'')),
 attachment:String(report&&report.attachment||''),comment:String(report&&report.comment||''),distribution:String(report&&report.distribution||'')}}
-function savePhotoReport(row){
+async function photoQuotaText(){try{if(navigator.storage&&navigator.storage.estimate){const e=await navigator.storage.estimate(),mb=n=>(n/1048576).toFixed(0);return ' Kho ảnh: đã dùng '+mb(e.usage||0)+' MB / ~'+mb(e.quota||0)+' MB.'}}catch(_){}return ''}
+async function savePhotoReport(row){
 const status=$('photo-status'),key=row._photoKey,owner=UID||'local',rep=photoReportFor(row);
 photoStore[key]=rep;photoTouched.add(key);
 const snap=JSON.parse(JSON.stringify(rep));
-PH_DB.put(owner+'|'+key,snap).then(()=>{photoStoreError=''}).catch(()=>{
-try{localStorage.setItem('hsnt_photos_'+owner,JSON.stringify(photoStore));photoStoreError=''}
-catch(error){photoStoreError='Không lưu được ảnh trên thiết bị ('+error.message+'). Hãy gỡ bớt ảnh cũ; dữ liệu Google Sheet không bị thay đổi.';status.textContent=photoStoreError}});
-status.textContent='Ảnh và thông tin phiếu đã lưu trên thiết bị này (kho ảnh lớn).';return true}
+try{await PH_DB.put(owner+'|'+key,snap);photoStoreError=''}
+catch(e1){
+try{localStorage.setItem('hsnt_photo_'+owner+'|'+key,JSON.stringify(snap));photoStoreError=''}
+catch(e2){photoStoreError='Không lưu được ảnh trên thiết bị ('+((e2&&e2.message)||(e1&&e1.message)||'hết dung lượng')+'). Ảnh này CHƯA được lưu — hãy gỡ bớt ảnh cũ hoặc giải phóng dung lượng trình duyệt; dữ liệu Google Sheet không bị thay đổi.';status.textContent=photoStoreError;return false}}
+status.textContent='Ảnh và thông tin phiếu đã lưu trên thiết bị này (kho ảnh lớn).';
+photoQuotaText().then(t=>{if(t&&!photoStoreError)status.textContent='Ảnh và thông tin phiếu đã lưu trên thiết bị này.'+t});
+return true}
 function photoEditorRender(){
 const select=$('photo-row');if(!select)return;
 ensurePhotoKeys();loadPhotoStore();
@@ -600,24 +606,28 @@ const report=photoReportFor(S.rows[index]),savedImages=report.images.filter(Bool
 document.querySelectorAll('[data-photo-image]').forEach(input=>{input.value='';const number=Number(input.dataset.photoImage),preview=document.querySelector(`[data-photo-preview="${number}"]`),image=report.images[number];preview.hidden=!image;if(image)preview.src=image});
 document.querySelectorAll('[data-photo-field]').forEach(input=>{input.value=report[input.dataset.photoField]||''});
 $('photo-status').textContent=photoStoreError||`STT ${index+1}: đã lưu ${savedImages}/4 ảnh cho biên bản này trên thiết bị hiện tại.`}
+const PHOTO_MAX_BYTES=400*1024,PHOTO_MAX_DIM=1600,PHOTO_MAX_SRC=60*1024*1024;
 async function compressPhoto(file){
 if(!file.type.startsWith('image/'))throw new Error('Tệp đã chọn không phải ảnh.');
-if(file.size>25*1024*1024)throw new Error('Ảnh gốc vượt quá 25 MB.');
+if(file.size>PHOTO_MAX_SRC)throw new Error('Ảnh gốc vượt quá '+(PHOTO_MAX_SRC/1048576)+' MB.');
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(_){}
 const bitmap=await createImageBitmap(file);
+const canvas=document.createElement('canvas');
 try{
-let scale=Math.min(1,1200/Math.max(bitmap.width,bitmap.height)),quality=.78,blob=null;
-for(let attempt=0;attempt<10;attempt++){
-const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
+let scale=Math.min(1,PHOTO_MAX_DIM/Math.max(bitmap.width,bitmap.height)),quality=.82,blob=null;
+for(let attempt=0;attempt<12;attempt++){
+canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
 const context=canvas.getContext('2d');if(!context)throw new Error('Không thể xử lý ảnh trong trình duyệt.');
+context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);
 context.drawImage(bitmap,0,0,canvas.width,canvas.height);
 blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',quality));
 if(!blob)throw new Error('Không thể chuyển ảnh sang định dạng in.');
-if(blob.size<=150*1024)break;
-if(quality>.5)quality-=.08;else scale*=.82
+if(blob.size<=PHOTO_MAX_BYTES)break;
+if(quality>.55)quality-=.07;else scale*=.85
 }
-if(!blob||blob.size>150*1024)throw new Error('Không thể nén ảnh xuống dưới 150 KB. Chọn ảnh khác.');
+if(!blob||blob.size>PHOTO_MAX_BYTES)throw new Error('Không thể nén ảnh xuống dưới '+Math.round(PHOTO_MAX_BYTES/1024)+' KB. Chọn ảnh khác.');
 return await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(new Error('Không đọc được ảnh đã chọn.'));reader.readAsDataURL(blob)})
-}finally{bitmap.close()}}
+}finally{bitmap.close();canvas.width=canvas.height=0}}
 document.getElementById('photo-row').addEventListener('change',event=>{cur=Number(event.target.value)||0;document.querySelector('.ty[value="p"]').checked=true;photoEditorRender();ap()});
 document.getElementById('photo-print-current').addEventListener('click',()=>{
 if(!S.rows.length)return;
@@ -630,7 +640,7 @@ if(build(true))fit().then(()=>setTimeout(()=>window.print(),150))
 document.getElementById('photo-entry').addEventListener('change',async event=>{
 const input=event.target;if(!input.matches('[data-photo-image]'))return;
 const file=input.files&&input.files[0];if(!file)return;
-try{const row=S.rows[cur],rowIndex=cur;if(!row)throw new Error('Chưa chọn biên bản.');const report=photoReportFor(row),imageIndex=Number(input.dataset.photoImage),previousImage=report.images[imageIndex];report.images[imageIndex]=await compressPhoto(file);if(!savePhotoReport(row)){report.images[imageIndex]=previousImage;throw new Error(photoStoreError)}document.querySelector('.ty[value="p"]').checked=true;photoEditorRender();ap();if(cur===rowIndex)$('photo-status').textContent=`STT ${rowIndex+1}: đã lưu ${report.images.filter(Boolean).length}/4 ảnh cho biên bản này trên thiết bị hiện tại.`}
+try{const row=S.rows[cur],rowIndex=cur;if(!row)throw new Error('Chưa chọn biên bản.');const report=photoReportFor(row),imageIndex=Number(input.dataset.photoImage),previousImage=report.images[imageIndex];report.images[imageIndex]=await compressPhoto(file);if(!(await savePhotoReport(row))){report.images[imageIndex]=previousImage;throw new Error(photoStoreError)}document.querySelector('.ty[value="p"]').checked=true;photoEditorRender();ap();if(cur===rowIndex)$('photo-status').textContent=`STT ${rowIndex+1}: đã lưu ${report.images.filter(Boolean).length}/4 ảnh cho biên bản này trên thiết bị hiện tại.`}
 catch(error){$('photo-status').textContent='Không thể chèn ảnh: '+error.message;input.value=''}});
 document.getElementById('photo-entry').addEventListener('click',event=>{
 const button=event.target.closest('[data-photo-clear]');if(!button)return;
@@ -1889,7 +1899,7 @@ document.querySelectorAll('#photo-entry .photo-upload').forEach(box=>{
 $('photo-status').insertAdjacentHTML('beforebegin','<label style="margin:6px 0;display:block"><input type="checkbox" id="photo-save-drive" style="width:auto"> Ảnh chọn từ máy: đồng thời lưu bản sao vào thư mục Drive <b class="dl-where">“Thư viện”</b> <small id="photo-drive-msg" style="color:var(--mu)"></small></label>');
 async function setPhoto(row,idx,file){
  const rep=photoReportFor(row),prev=rep.images[idx];rep.images[idx]=await compressPhoto(file);
- if(!savePhotoReport(row)){rep.images[idx]=prev;throw new Error(photoStoreError)}}
+ if(!(await savePhotoReport(row))){rep.images[idx]=prev;throw new Error(photoStoreError)}}
 $('photo-entry').addEventListener('click',async e=>{
  const b=e.target.closest('[data-photo-drive]');if(!b)return;
  const idx=Number(b.dataset.photoDrive),row=S.rows[cur],st=$('photo-status');
