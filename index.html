@@ -307,7 +307,7 @@ button,input,select,textarea{font-family:inherit}
 <div class="g"><div><label for="photo-attachment">Đính kèm</label><input id="photo-attachment" data-photo-field="attachment"></div>
 <div><label for="photo-distribution">Phân phối</label><input id="photo-distribution" data-photo-field="distribution"></div>
 <div style="grid-column:1/-1"><label for="photo-comment">Ý kiến</label><textarea id="photo-comment" rows="3" data-photo-field="comment"></textarea></div></div>
-<div class="bar"><button type="button" id="photo-print-current">In biên bản đang chọn kèm ảnh</button></div>
+<div class="bar"><button type="button" id="photo-print-current">In biên bản đang chọn kèm ảnh</button><button type="button" id="photo-save-file" class="s">💾 Lưu biên bản (PDF → Drive)</button></div>
 <div id="photo-status" role="status" aria-live="polite"></div></div></details>
 <details id="att-entry"><summary>5. Chèn file PDF vào biên bản (in kèm sau biên bản)</summary><div class="in">
 <div><label for="att-row">Biên bản cần gắn PDF</label><select id="att-row"></select></div>
@@ -606,15 +606,17 @@ const report=photoReportFor(S.rows[index]),savedImages=report.images.filter(Bool
 document.querySelectorAll('[data-photo-image]').forEach(input=>{input.value='';const number=Number(input.dataset.photoImage),preview=document.querySelector(`[data-photo-preview="${number}"]`),image=report.images[number];preview.hidden=!image;if(image)preview.src=image});
 document.querySelectorAll('[data-photo-field]').forEach(input=>{input.value=report[input.dataset.photoField]||''});
 $('photo-status').textContent=photoStoreError||`STT ${index+1}: đã lưu ${savedImages}/4 ảnh cho biên bản này trên thiết bị hiện tại.`}
-const PHOTO_MAX_BYTES=400*1024,PHOTO_MAX_DIM=1600,PHOTO_MAX_SRC=60*1024*1024;
-async function compressPhoto(file){
+const PHOTO_MAX_BYTES=250*1024,PHOTO_MAX_DIM=1280,PHOTO_MAX_SRC=60*1024*1024;
+const PHOTO_CACHE=new WeakMap();
+function compressPhoto(file){let p=PHOTO_CACHE.get(file);if(!p){p=compressPhotoRaw(file);PHOTO_CACHE.set(file,p);p.catch(()=>PHOTO_CACHE.delete(file))}return p}
+async function compressPhotoRaw(file){
 if(!file.type.startsWith('image/'))throw new Error('Tệp đã chọn không phải ảnh.');
 if(file.size>PHOTO_MAX_SRC)throw new Error('Ảnh gốc vượt quá '+(PHOTO_MAX_SRC/1048576)+' MB.');
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(_){}
 const bitmap=await createImageBitmap(file);
 const canvas=document.createElement('canvas');
 try{
-let scale=Math.min(1,PHOTO_MAX_DIM/Math.max(bitmap.width,bitmap.height)),quality=.82,blob=null;
+let scale=Math.min(1,PHOTO_MAX_DIM/Math.max(bitmap.width,bitmap.height)),quality=.8,blob=null;
 for(let attempt=0;attempt<12;attempt++){
 canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
 const context=canvas.getContext('2d');if(!context)throw new Error('Không thể xử lý ảnh trong trình duyệt.');
@@ -635,7 +637,7 @@ const index=Math.max(0,Math.min(Number($('photo-row').value)||0,S.rows.length-1)
 cur=index;
 document.querySelector('.ty[value="p"]').checked=true;
 $('rng').value=String(index+1);
-if(build(true))fit().then(()=>setTimeout(()=>window.print(),150))
+if(build(true))fit().then(()=>setTimeout(()=>printAs((()=>{try{return recName(S.rows[index],index)}catch(e){return ''}})()),150))
 });
 document.getElementById('photo-entry').addEventListener('change',async event=>{
 const input=event.target;if(!input.matches('[data-photo-image]'))return;
@@ -718,6 +720,8 @@ const hd=d=>`<div class="hh2"><b>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</
 const tg=r=>r.tg||S.g.tgd||'……………………';
 const so=(r,i)=>r.so||i+1;
 const mh=(r,i)=>G().pr+'-'+r.ma+'-'+so(r,i),mb=(r,i)=>G().pc+'-'+r.ma+'-'+so(r,i),mn=r=>G().pc+'- '+r.ma;
+const recName=(r,i)=>String(mh(r,i)).replace(/[\\\/:*?"<>|]+/g,'-').replace(/\s+/g,' ').trim();
+function printAs(t){const old=document.title;if(t)document.title=t;const back=()=>{document.title=old;window.removeEventListener('afterprint',back)};window.addEventListener('afterprint',back);window.print()}
 const nd=r=>[r.ten,r.hm,r.vt].filter(Boolean).join(' ');
 const pz=s=>/^\d+$/.test(s)?String(+s):s,Fz=d=>d?(dparts(d)?dparts(d).reverse().map(pz).join('/'):String(d)):'…/…/…',Pz=d=>P(d).map(pz);
 const FC=()=>`<div class="fcd">${esc(G().fc||'NVLG-PCD-REG05.F01.07 (08-01/07/2025)')}</div>`;
@@ -1915,8 +1919,50 @@ $('photo-entry').addEventListener('change',async e=>{
  const i=e.target;if(!i.matches('[data-photo-image]')||!$('photo-save-drive').checked)return;
  const f=i.files&&i.files[0];if(!f)return;const m=$('photo-drive-msg');
  if(!TK){m.textContent='— chưa đăng nhập nên không lưu được lên Drive';return}
- try{m.textContent='— đang lưu lên Drive…';await upload(f,DL.cur.id);m.textContent='— đã lưu bản sao lên Drive.';if(MB.id===DL.cur.id)MB.open(MB.id)}
+ try{m.textContent='— đang lưu lên Drive…';const du=await compressPhoto(f),bin=atob(du.split(',')[1]),u8=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)u8[k]=bin.charCodeAt(k);const rw=S.rows[cur],nm=rw?recName(rw,cur)+'_Anh'+(Number(i.dataset.photoImage)+1):f.name.replace(/\.[^.]+$/,'');await upload(new File([u8],nm+'.jpg',{type:'image/jpeg'}),DL.cur.id);m.textContent='— đã lưu bản sao (đã tối ưu) lên Drive.';if(MB.id===DL.cur.id)MB.open(MB.id)}
  catch(er){m.textContent='— lỗi lưu Drive: '+er.message}});
+
+/* ---- Lưu biên bản đang chọn thành PDF + lưu vào Drive ---- */
+const H2C_URL='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',JSPDF_URL='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+function loadScriptOnce(src){return new Promise((res,rej)=>{const e=document.createElement('script');e.src=src;e.onload=()=>res();e.onerror=()=>rej(new Error('Không tải được công cụ tạo PDF (cần có mạng).'));document.head.appendChild(e)})}
+$('photo-save-file').addEventListener('click',async()=>{
+ const btn=$('photo-save-file'),st=$('photo-status');
+ if(!S.rows.length){st.textContent='Chưa có biên bản để lưu.';return}
+ const index=Math.max(0,Math.min(Number($('photo-row').value)||0,S.rows.length-1));
+ cur=index;document.querySelector('.ty[value="p"]').checked=true;$('rng').value=String(index+1);
+ if(!build(true)){st.textContent=$('pv-status').textContent||'Không tạo được biên bản.';return}
+ btn.disabled=true;let host=null;
+ try{
+  await fit();
+  st.textContent='Đang tải công cụ tạo PDF…';
+  if(!window.html2canvas)await loadScriptOnce(H2C_URL);
+  if(!(window.jspdf&&window.jspdf.jsPDF))await loadScriptOnce(JSPDF_URL);
+  const pages=[...$('pv').querySelectorAll('.pg')];
+  if(!pages.length)throw new Error('Không có trang nào để lưu.');
+  host=document.createElement('div');host.id='pdfhost';
+  host.style.cssText='position:fixed;left:0;top:0;width:210mm;z-index:-1;pointer-events:none;background:#fff';
+  const sty=document.createElement('style');
+  sty.textContent='#pdfhost .pg{box-sizing:border-box;display:block;position:relative;float:none;width:210mm;height:296mm;min-height:0;margin:0;padding:var(--mt,12mm) var(--mr,12mm) var(--mb,12mm) var(--ml,20mm);overflow:hidden;border:0;background:#fff}';
+  host.appendChild(sty);
+  pages.forEach(pg=>host.appendChild(pg.cloneNode(true)));
+  document.body.appendChild(host);
+  const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4',orientation:'portrait',compress:true});
+  const clones=[...host.querySelectorAll('.pg')];
+  for(let k=0;k<clones.length;k++){
+   st.textContent='Đang tạo PDF… trang '+(k+1)+'/'+clones.length;
+   const cv=await window.html2canvas(clones[k],{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false});
+   if(k)doc.addPage('a4','portrait');
+   doc.addImage(cv.toDataURL('image/jpeg',.9),'JPEG',0,0,210,296,undefined,'FAST');
+   cv.width=cv.height=0;
+   await new Promise(r=>setTimeout(r,0))}
+  const blob=doc.output('blob'),name=recName(S.rows[index],index)||('Bien-ban-'+(index+1));
+  const url=URL.createObjectURL(blob),an=document.createElement('a');an.href=url;an.download=name+'.pdf';document.body.appendChild(an);an.click();an.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
+  let msg='Đã tạo PDF “'+name+'.pdf” và tải về máy.';
+  if(TK){try{st.textContent='Đang lưu PDF lên Drive…';await upload(new File([blob],name+'.pdf',{type:'application/pdf'}),DL.cur.id);msg+=' Đã lưu vào thư mục Drive “'+DL.cur.name+'”.';if(MB.id===DL.cur.id)MB.open(MB.id)}catch(er){msg+=' Lưu lên Drive bị lỗi: '+er.message}}
+  else msg+=' Chưa đăng nhập nên chưa lưu lên Drive.';
+  st.textContent=msg
+ }catch(er){st.textContent='Không tạo được PDF: '+er.message}
+ finally{if(host)host.remove();btn.disabled=false}});
 
 /* ---- Mục 5: trình duyệt thư viện ---- */
 const MB=browser($('dl-host'),{});
