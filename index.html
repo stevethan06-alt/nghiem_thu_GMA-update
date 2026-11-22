@@ -383,7 +383,7 @@ let nextRecordNumbers={};
 const TABLE_FILTERS={},QF_TABLE_FILTERS={};
 let selectedRecordClass='';
 let tableSort={key:'',direction:1};
-let filterDraft=null,photoStoreOwner='',photoStore={},photoStoreError='';
+let filterDraft=null,photoStoreOwner='',photoStore={},photoStoreError='',photoDbReady=false,photoAdoptNote='';
 const filterNorm=value=>String(value||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
 function recordClass(row){
 const text=filterNorm([row.hm,row.loai,row.ten].join(' '));
@@ -561,7 +561,7 @@ async all(prefix){const db=await this.open();return new Promise((ok,bad)=>{const
 function loadPhotoStore(){
 const owner=UID||'local';
 if(photoStoreOwner===owner)return;
-photoStoreOwner=owner;photoStore={};photoStoreError='';photoTouched.clear();
+photoStoreOwner=owner;photoStore={};photoStoreError='';photoDbReady=false;photoAdoptNote='';photoTouched.clear();
 let legacy={};
 try{legacy=JSON.parse(localStorage.getItem('hsnt_photos_'+owner)||'{}')||{}}
 catch(error){photoStoreError='Không đọc được ảnh đã lưu trên thiết bị: '+error.message}
@@ -573,8 +573,30 @@ if(photoStoreOwner!==owner)return;
 Object.keys(data).forEach(k=>{if(!photoTouched.has(k))photoStore[k]=data[k]});
 const lk=Object.keys(legacy);
 if(lk.length){try{for(const k of lk)if(!(k in data))await PH_DB.put(owner+'|'+k,legacy[k]);localStorage.removeItem('hsnt_photos_'+owner);perKeys.forEach(k=>localStorage.removeItem(k))}catch(e){}}
-photoEditorRender();ap()
-}).catch(error=>{photoStoreError='Không mở được kho ảnh IndexedDB ('+(error&&error.message||error)+'); dùng tạm localStorage (dung lượng nhỏ).'})}
+photoDbReady=true;photoEditorRender();ap()
+}).catch(error=>{photoDbReady=true;photoStoreError='Không mở được kho ảnh IndexedDB ('+(error&&error.message||error)+'); dùng tạm localStorage (dung lượng nhỏ).'})}
+/* Khoá ảnh sinh từ nội dung dòng (mã, số BB, ngày...). Khi các ô này đổi (vd. tự đánh số BB, nhập ngày NTCV) rồi tải lại từ Google Sheet,
+   khoá mới không còn khớp khoá cũ => ảnh vẫn nằm trong IndexedDB nhưng "mất" khỏi dòng. Hàm này nối lại ảnh mồ côi theo các ô ổn định
+   (mã công tác, vị trí, hạng mục, loại, tên), chỉ nối khi khớp duy nhất/rõ ràng. */
+function adoptOrphanPhotos(){
+if(!photoDbReady||!S||!S.rows)return;
+const has=v=>!!v&&((v.images||[]).some(Boolean)||v.comment||v.attachment||v.distribution||(v.pdfs&&v.pdfs.length)),
+ n=x=>String(x||'').trim(),claimed=new Set(S.rows.map(r=>r._photoKey)),orphans=[];
+Object.keys(photoStore).forEach(k=>{if(claimed.has(k)||!has(photoStore[k]))return;let a;try{a=JSON.parse(k.replace(/(#\d+)+$/,''))}catch(e){return}if(Array.isArray(a)&&a.length===8)orphans.push({k,a:a.map(n)})});
+if(!orphans.length)return;
+let done=0;
+S.rows.forEach(row=>{
+ if(has(photoStore[row._photoKey])||!orphans.length)return;
+ const st=[row.ma,row.vt,row.hm,row.loai,row.ten].map(n);
+ if(!(st[0]||st[2]||st[4]))return;
+ const c=orphans.filter(o=>[o.a[0],o.a[4],o.a[5],o.a[6],o.a[7]].every((x,i)=>x===st[i]));
+ if(!c.length)return;
+ const sc=o=>(n(row.so)&&o.a[1]===n(row.so)?1:0)+(n(row.gui)&&o.a[2]===n(row.gui)?1:0)+(n(row.td)&&o.a[3]===n(row.td)?1:0);
+ c.sort((x,y)=>sc(y)-sc(x));
+ if(c.length>1&&sc(c[0])===sc(c[1]))return;
+ row._photoKey=c[0].k;orphans.splice(orphans.indexOf(c[0]),1);done++});
+photoAdoptNote=done?`Đã nối lại ảnh cho ${done} biên bản (khớp theo mã/hạng mục/vị trí).`:'';
+}
 function photoReportFor(row){
 if(!row.photoReport||typeof row.photoReport!=='object')row.photoReport={images:['','','',''],attachment:'',comment:'',distribution:''};
 if(!Array.isArray(row.photoReport.images))row.photoReport.images=['','',''];
@@ -600,7 +622,7 @@ photoQuotaText().then(t=>{if(t&&!photoStoreError)status.textContent='Ảnh và t
 return true}
 function photoEditorRender(){
 const select=$('photo-row');if(!select)return;
-ensurePhotoKeys();loadPhotoStore();
+ensurePhotoKeys();loadPhotoStore();adoptOrphanPhotos();
 S.rows.forEach(row=>photoReportFor(row));
 select.innerHTML=S.rows.map((row,index)=>`<option value="${index}">STT ${index+1} · ${esc(row.ma||row.ten||'Biên bản')} · ${esc(row.hm||'')} · ${esc(row.vt||'')}</option>`).join('');
 if(!S.rows.length){select.innerHTML='<option value="">Chưa có biên bản</option>';select.disabled=true;document.querySelectorAll('[data-photo-image],[data-photo-field],[data-photo-clear]').forEach(input=>input.disabled=true);$('photo-status').textContent='Thêm hoặc tải biên bản trước khi nhập ảnh.';return}
@@ -610,7 +632,7 @@ const index=Math.max(0,Math.min(Number(cur)||0,S.rows.length-1));cur=index;selec
 const report=photoReportFor(S.rows[index]),savedImages=report.images.filter(Boolean).length;
 document.querySelectorAll('[data-photo-image]').forEach(input=>{input.value='';const number=Number(input.dataset.photoImage),preview=document.querySelector(`[data-photo-preview="${number}"]`),image=report.images[number];preview.hidden=!image;if(image)preview.src=image});
 document.querySelectorAll('[data-photo-field]').forEach(input=>{input.value=report[input.dataset.photoField]||''});
-$('photo-status').textContent=photoStoreError||`STT ${index+1}: đã lưu ${savedImages}/4 ảnh cho biên bản này trên thiết bị hiện tại.`}
+$('photo-status').textContent=photoStoreError||(photoAdoptNote?photoAdoptNote+' ':'')+`STT ${index+1}: đã lưu ${savedImages}/4 ảnh cho biên bản này trên thiết bị hiện tại.`}
 const PHOTO_MAX_BYTES=250*1024,PHOTO_MAX_DIM=1280,PHOTO_MAX_SRC=60*1024*1024;
 const PHOTO_CACHE=new WeakMap();
 function compressPhoto(file){let p=PHOTO_CACHE.get(file);if(!p){p=compressPhotoRaw(file);PHOTO_CACHE.set(file,p);p.catch(()=>PHOTO_CACHE.delete(file))}return p}
